@@ -23,8 +23,8 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     frames_fft = fft( frames_windowed, FRAME_LENGTH, 1 );
     
     % Extract norm and angle ( for half + first fft coefficients )
-    r = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
-    f = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
+    r = abs( frames_fft( 2 : FRAME_LENGTH / 2 + 1, : ) );
+    f = abs( frames_fft( 2 : FRAME_LENGTH / 2 + 1, : ) );
     clear frames_fft
     
     %% Compute prediction

@@ -75,7 +75,7 @@ function x = iAACoder3( AACSeq3, fNameOut )
         % Right Channel
         %   - Huffman decode
         if ( LEVEL_3_ENCODER_HUFFMAN )
-
+            
             % decode mdcts
             S = decodeHuff( ...
                 AACSeq3( frame_i ).chr.stream, ...

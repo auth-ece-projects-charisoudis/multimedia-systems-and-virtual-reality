@@ -39,7 +39,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     
     % Initial Approximation Step
     a0 = ( 16 / 3 ) * log2( max( frame ) ^ 0.75 / MQ );
-    a( : ) = a0;
+    a( : ) = a0 - 1;
     
     % Optimization Step
     for b = 1 : NBANDS
@@ -48,7 +48,13 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         wlow = std_table( b, 2 ) + 1;
         whigh = std_table( b, 3 ) + 1;
         
-        while ( 1 )
+        Pe = T( b ) - 1;
+        Sb_q = zeros( whigh - wlow + 1, 1 );
+
+        while ( Pe < T( b ) && max( abs( diff( a ) ) ) < 60 )
+            
+            % Increment sfc ( lowers quantizer's quality in this band )
+            a( b ) = a( b ) + 1;
 
             % Quantize frame coefficients        
             Sb_q = ...
@@ -66,20 +72,13 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
                 * 2^( 0.25 * a( b ) ) ...
             );
             
-            % Increment sfc ( lowers quantizer's quality in this band )
-            a( b ) = a( b ) + 1;
-        
-            if ( Pe >= T( b ) || abs( a( b ) - a0 ) > 60 )
-                break                
-            end
-            
         end
         
         % Assign final quantized MDCTs to output argument
         S( wlow : whigh ) = Sb_q;
         
         % Slide a0
-        a0 = a( b );
+%         a0 = a( b );
         
     end
     
