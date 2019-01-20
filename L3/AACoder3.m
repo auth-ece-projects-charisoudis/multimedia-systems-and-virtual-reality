@@ -61,6 +61,8 @@ function AACSeq3 = AACoder3( fNameIn )
     frameTprev2_R = zeros( FRAME_LENGTH, 1 );
     for frame_i = 1 : NFRAMES
         
+        frame_i
+        
         % Left Channel
         %   - save frame in time
         frameT_L = AACSeq3( frame_i ).chl.frameT;

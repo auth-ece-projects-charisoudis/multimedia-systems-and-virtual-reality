@@ -24,7 +24,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     
     % Extract norm and angle ( for half + first fft coefficients )
     r = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
-    f = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
+    f = angle( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
     clear frames_fft
     
     %% Compute prediction
@@ -34,7 +34,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     r = r( :, 1 );
     f = f( :, 1 );
     
-    %% Predictability Measure
+    %% Predictability Measure    
     c = sqrt( ...
         ( r .* cos( f ) - rpred .* cos( fpred ) ) .^ 2 + ...
         ( r .* sin( f ) - rpred .* sin( fpred ) ) .^ 2 ...
@@ -66,7 +66,10 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     en = ecb ./ ( sum( spreading_matrix )' );
     
     %% Tonality Index ( for each band )
-    tb = -0.299 - 0.43 * log( cb ); % ln is 'log' in MATLAB
+    tb = -0.299 - 0.43 * log( cb ) % ln is 'log' in MATLAB
+    
+    assert( max( tb ) < 1 )
+    assert( min( tb ) > 0 )
     
     %% SNR
     % TMN( b ) = 6dB constant for all bands

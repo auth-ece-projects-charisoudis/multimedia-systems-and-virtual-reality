@@ -82,10 +82,10 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         
             if ( ~printed )
                 
-                wi
-                Sb_q
-                
-                printed = true;
+%                 wi
+%                 Sb_q
+%                 
+%                 printed = true;
                 
             end
         

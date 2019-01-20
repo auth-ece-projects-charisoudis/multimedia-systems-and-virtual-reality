@@ -23,7 +23,7 @@ function x = L3_PSYCHO_SPREADING_cell( frameType, bi, bj  )
     end
     
     %% tmpx
-    tmpx = 1.5 * bval( bj ) - bval( bi );
+    tmpx = 1.5 * ( bval( bj ) - bval( bi ) );
     if ( bi >= bj )
        
         tmpx = 2 * tmpx;

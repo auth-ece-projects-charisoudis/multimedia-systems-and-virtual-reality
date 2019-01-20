@@ -29,13 +29,13 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
 
     %% Constants
     WINDOW_LENGTH = length( frameT );
-    ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.SameAsFirst;
+    ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
     
     %% Load Standard's Tables
     %  - B219a: for Long Windows
     %  - B219b: for Short Windows
-    global B219a;
-    global B219b;
+    global B219a
+    global B219b
 
     %% Compute Sreading Function Matrix ( once for each frame type )
     persistent spreading_matrix_short
@@ -139,7 +139,8 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         % Check if previous frames exist
         if ( ~ any( frameTprev1 ~= 0 ) )
-            
+            % Both previous frames missing
+                        
             switch( ON_PREV_MISSING_POLICY )
             
                 case L3_PSYCHO_MissingPolicies.SameAsFirst
@@ -155,6 +156,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
             end
            
         elseif ( ~ any( frameTprev2 ~= 0 ) )
+            % One previous frame missing
             
             switch( ON_PREV_MISSING_POLICY )
             

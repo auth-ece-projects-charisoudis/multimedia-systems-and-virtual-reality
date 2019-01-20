@@ -26,6 +26,6 @@ function SNR = demoAAC2( fNameIn, fNameOut )
     toc
 
     % Print SNR
-    [ SNR, ~, ~ ] = L1_AACORDER_snr( y, y_out );
+    [ SNR, ~, ~ ] = L1_AACODER_snr( y, y_out );
 
 end
