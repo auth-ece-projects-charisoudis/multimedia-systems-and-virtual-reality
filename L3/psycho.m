@@ -29,7 +29,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
 
     %% Constants
     WINDOW_LENGTH = length( frameT );
-    ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
+    ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.SameAsFirst;
     
     %% Load Standard's Tables
     %  - B219a: for Long Windows

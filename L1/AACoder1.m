@@ -11,7 +11,12 @@ function AACSeq1 = AACoder1( fNameIn )
     WINDOW_LENGTH = 2048;
     OVERLAP_LENGTH = WINDOW_LENGTH / 2;
 
-    WINDOW_SHAPE = 'SIN';
+    global WINDOW_SHAPE
+    if ( isempty( WINDOW_SHAPE ) )
+        
+        WINDOW_SHAPE = 'SIN';
+        
+    end
 
     %% Read wav file
     [y, ~] = audioread( fNameIn );
