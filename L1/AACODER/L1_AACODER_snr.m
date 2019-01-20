@@ -1,4 +1,4 @@
-function [ SNR, SNR_L, SNR_R ] = L1_AACORDER_snr( original, reconstructed )
+function [ SNR, SNR_L, SNR_R ] = L1_AACODER_snr( original, reconstructed )
 %L1_AACORDER_SNR calculates SNR between the original and the reconstructed
 %signal.
 % 
