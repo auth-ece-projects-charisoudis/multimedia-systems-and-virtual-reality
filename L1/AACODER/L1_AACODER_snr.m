@@ -12,7 +12,7 @@ function [ SNR, SNR_L, SNR_R ] = L1_AACODER_snr( original, reconstructed )
 %
 
     % SNR Class Object
-    snrOb = Snr( original, reconstructed );
+    snrOb = L1_AACODER_SnrCalculator( original, reconstructed );
     
     % Parse result
     SNR_L = snrOb.channelLeft;
