@@ -19,7 +19,7 @@ function SNR = demoAAC3( fNameIn, fNameOut )
     global LEVEL_3_ENCODER_HUFFMAN
     global LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS
     LEVEL_3_ENCODER_HUFFMAN = true;
-    LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS = true;
+    LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS = false;
 
     %% Start!
     clearvars -except fNameIn fNameOut y NSAMPLES_PAD_RIGHT;
@@ -43,6 +43,6 @@ function SNR = demoAAC3( fNameIn, fNameOut )
     toc
 
     % Print SNR
-    [ SNR, ~, ~ ] = L1_AACORDER_snr( y, y_out );
+    [ SNR, ~, ~ ] = L1_AACODER_snr( y, y_out );
 
 end
