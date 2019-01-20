@@ -1,4 +1,4 @@
-function SNR = demoAAC3( fNameIn, fNameOut )
+function [ SNR_M,  = demoAAC3( fNameIn, fNameOut )
 %DEMOAAC2 Executes Level-3 AAC Codec and calculates SNR
 %   
 %   fNameIn: input wav's filename
