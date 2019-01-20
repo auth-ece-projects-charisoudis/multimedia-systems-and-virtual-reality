@@ -2,6 +2,12 @@ classdef L1_AACODER_SnrCalculator
     %SNR Class to hold the SNR of each channel and the mean SNR for the
     %audio coding technique used.
     
+    properties( Constant )
+       
+        meanMethod = 'rms'
+        
+    end
+    
     properties
         
         computeMethod
@@ -60,8 +66,10 @@ classdef L1_AACODER_SnrCalculator
             
             % Mean SNR ( using rms: should be polarized towards edge values
             % )
-            obj.mean = sign( obj.channelLeft ) * ...
-                rms( [ obj.channelLeft; obj.channelRight ] );
+            obj.mean = sign( obj.channelLeft ) * feval( ...
+                L1_AACODER_SnrCalculator.meanMethod, ...
+                [ obj.channelLeft; obj.channelRight ] ...
+            );
             
         end
         

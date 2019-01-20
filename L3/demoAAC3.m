@@ -8,15 +8,8 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
 %   
 
     %% Get y for SNR calculation
-    [ y, ~ ] = audioread( fNameIn );
-    
-    % Constants
+    [ y, FS ] = audioread( fNameIn );
     NSAMPLES = length( y );
-    OVERLAP_LENGTH = 1024;
-    NSAMPLES_PAD_RIGHT = OVERLAP_LENGTH - rem( NSAMPLES, OVERLAP_LENGTH );
-    
-    % Format y
-    y = [ y; zeros( NSAMPLES_PAD_RIGHT, 2 ) ];
     
     %% Global Settings
     global LEVEL_3_ENCODER_RUNNING
@@ -28,7 +21,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS = false;
 
     %% Start!
-    clearvars -except fNameIn fNameOut y NSAMPLES;
+    clearvars -except fNameIn fNameOut y NSAMPLES FS;
     clc
     tic
     
@@ -38,29 +31,36 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     %% Decoder
     y_out = iAACoder3( AACSeq3, fNameOut );
     
+    % Trim output back to original number of samples
+    y_out = y_out( 1 : NSAMPLES, : );
+    
     % Write Codec's output to file
     if( nargout == 0 )
        
-        audiowrite( fNameOut, y_out( 1 : NSAMPLES, : ), 48000 );
+        audiowrite( fNameOut, y_out, FS );
         
     end
     
     %% Finished
     toc
 
-    % Compute SNR
+    %% Compute SNR
     snrOb = L1_AACODER_SnrCalculator( y, y_out );
     SNR = snrOb.mean;
     
-    % Compute bitrate
+    %% Compute bitrate
+    % Original
+    secs = NSAMPLES / FS;
+    finfo = dir( fNameIn );
+    bitrate_original = ( finfo.bytes * 8 ) / secs;
+    
+    % Reconstructed
     %   - 48000 samples / sec
     %   - x bits / sample
-    bits_per_sample = 0;
-    bitrate = bits_per_sample * 48000;
+    total_bits = L3_AACODER_sec2bits( AACSeq3 );
+    bitrate = total_bits / secs;
     
-    % Compute compression
-    finfo = dir( fNameIn );
-    bitrate_original = ( finfo.bytes * 8 ) / ( NSAMPLES / 48000 );
+    %% Compute compression
     compression = bitrate / bitrate_original;
 
 end
