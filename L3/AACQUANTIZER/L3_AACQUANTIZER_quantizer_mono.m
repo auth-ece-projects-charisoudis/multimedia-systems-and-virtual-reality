@@ -14,9 +14,23 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     FRAME_LENGTH = length( frame );
     NBANDS = length( SMR );
     
-    persistent MQ MagicNumber
+    persistent MQ MagicNumber wi firstEshCounted
     MagicNumber = 0.4054;
     MQ = 8191;
+    
+    if isempty( firstEshCounted )
+        firstEshCounted = false;
+    end
+    
+    if isempty( wi )
+        wi = 0;
+    elseif NBANDS == 69
+        wi = wi + 1;
+        firstEshCounted = false;
+    elseif ~firstEshCounted
+        wi = wi + 1;
+        firstEshCounted = true;
+    end
 
     %% MDCT Coefficients' Energy
     P = zeros( NBANDS, 1 );
@@ -42,16 +56,17 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     a( : ) = a0 - 1;
     
     % Optimization Step
+    printed = false;
     for b = 1 : NBANDS
         
         % Band Limits
         wlow = std_table( b, 2 ) + 1;
         whigh = std_table( b, 3 ) + 1;
         
-        Pe = T( b ) - 1;
+        Pe = T( b );
         Sb_q = zeros( whigh - wlow + 1, 1 );
 
-        while ( Pe < T( b ) && max( abs( diff( a ) ) ) < 60 )
+        while ( Pe <= T( b ) && max( abs( diff( a ) ) ) < 60 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
             a( b ) = a( b ) + 1;
@@ -64,6 +79,15 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
                     .^ 0.75 + MagicNumber ...
                 ) ...
             ;
+        
+            if ( ~printed )
+                
+                wi
+                Sb_q
+                
+                printed = true;
+                
+            end
         
             % Calculate Quntization Noise Power
             Pe = sumsqr( ...
