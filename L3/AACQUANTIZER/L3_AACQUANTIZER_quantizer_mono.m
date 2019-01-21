@@ -49,8 +49,6 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         whigh = std_table( b, 3 ) + 1;
         
         Pe = T( b );
-        Sb_q = zeros( whigh - wlow + 1, 1 );
-
         while ( Pe <= T( b ) && max( abs( a( b ) - a0 ) ) < 60 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
@@ -74,18 +72,15 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
             
         end
         
-        % Revert to last a( b ) & re-calculate
+        % Revert to last a( b ) & re-calculate quantized frequency samples
         a( b ) = a( b ) - 1;
-        Sb_q = ...
+        S( wlow : whigh ) = ...
             L2_TNS_QUANTIZER_sgn( frame( wlow : whigh ) ) .* ...
             floor( ...
                 ( 2^( -0.25 * a( b ) ) * abs( frame( wlow : whigh ) ) ) ...
                 .^ 0.75 + MagicNumber ...
             ) ...
         ;
-        
-        % Assign final quantized MDCTs to output argument
-        S( wlow : whigh ) = Sb_q;
         
         % Slide a0
         a0 = a( b );
