@@ -22,7 +22,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     %% FFT for each frame
     frames_fft = fft( frames_windowed, FRAME_LENGTH, 1 );
     
-    % Extract norm and angle ( for half + first fft coefficients )
+    % Extract norm and angle ( for ( half + 1 ) fft coefficients )
     r = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
     f = angle( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
     clear frames_fft
@@ -66,10 +66,14 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     en = ecb ./ ( sum( spreading_matrix )' );
     
     %% Tonality Index ( for each band )
-    tb = -0.299 - 0.43 * log( cb ) % ln is 'log' in MATLAB
+    tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
     
-    assert( max( tb ) < 1 )
-    assert( min( tb ) > 0 )
+    % Clip tb
+%     tb = abs( tb );
+%     tb( tb > 1 ) = 1 - eps();
+%     
+%     assert( max( tb ) < 1 )
+%     assert( min( tb ) > 0 )
     
     %% SNR
     % TMN( b ) = 6dB constant for all bands

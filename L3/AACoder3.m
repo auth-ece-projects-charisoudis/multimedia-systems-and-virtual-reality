@@ -42,6 +42,13 @@ function AACSeq3 = AACoder3( fNameIn )
         HUFFMAN_LUT = loadLUT();
         
     end
+    
+    global ON_PREV_MISSING_POLICY
+    if ( isempty( ON_PREV_MISSING_POLICY ) )
+        
+        ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;
+        
+    end
 
     %% Level-2 Encoder
     AACSeq2 = AACoder2( fNameIn );
@@ -55,24 +62,58 @@ function AACSeq3 = AACoder3( fNameIn )
     AACSeq3 = AACSeq2;
     
     % Psychoaccoustic Model
-    frameTprev1_L = zeros( FRAME_LENGTH, 1 );
-    frameTprev2_L = zeros( FRAME_LENGTH, 1 );
-    frameTprev1_R = zeros( FRAME_LENGTH, 1 );
-    frameTprev2_R = zeros( FRAME_LENGTH, 1 );
-    for frame_i = 1 : NFRAMES
+    %  - initialize    
+    if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
         
-        frame_i
+        frameTprev1_L = AACSeq3( 2 ).chl.frameT;
+        frameTprev2_L = AACSeq3( 1 ).chl.frameT;
+        frameTprev1_R = AACSeq3( 2 ).chr.frameT;
+        frameTprev2_R = AACSeq3( 1 ).chr.frameT;
         
-        % Left Channel
+        frame_i_start = 3;        
+        deferred_frame_i = frame_i_start;
+        frame_i = [ ...
+            frame_i_start ...
+            1 : frame_i_start - 1 ...
+            frame_i_start + 1 : NFRAMES ...
+        ];
+        
+    else
+        
+        frameTprev1_L = zeros( FRAME_LENGTH, 1 );
+        frameTprev2_L = zeros( FRAME_LENGTH, 1 );
+        frameTprev1_R = zeros( FRAME_LENGTH, 1 );
+        frameTprev2_R = zeros( FRAME_LENGTH, 1 );
+        
+        frame_i = 1 : NFRAMES;
+        
+    end
+    
+    %  - run
+    deferred_execution = false;
+    for frame_i = frame_i
+        
+        sprintf( '%d', frame_i );
+        
+        %% Left Channel
         %   - save frame in time
         frameT_L = AACSeq3( frame_i ).chl.frameT;
         
         %   - compute SMR
-        SMR_L = psycho( ...
-            frameT_L, ...
-            AACSeq3( frame_i ).frameType, ...
-            frameTprev1_L, frameTprev2_L ...
-        );
+        if ( ~deferred_execution )
+            
+            SMR_L = psycho( ...
+                frameT_L, ...
+                AACSeq3( frame_i ).frameType, ...
+                frameTprev1_L, frameTprev2_L ...
+            );
+        
+        else
+            
+            % SMR_L retains its last value, thus 3rd frame's SMR ( for left
+            % channel )
+        
+        end
     
         %   - quantize
         [ S, sfc, AACSeq3( frame_i ).chl.G ] = AACquantizer( ...
@@ -121,19 +162,33 @@ function AACSeq3 = AACoder3( fNameIn )
         end
     
         %   - slide Frames
-        frameTprev2_L = frameTprev1_L;
-        frameTprev1_L = frameT_L;
+        if ( ~deferred_execution )
+            
+            frameTprev2_L = frameTprev1_L;
+            frameTprev1_L = frameT_L;
+            
+        end
+        
     
-        % Right Channel
+        %% Right Channel
         %   - save frame in time
         frameT_R = AACSeq3( frame_i ).chr.frameT;
         
         %   - compute SMR
-        SMR_R = psycho( ...
-            frameT_R, ...
-            AACSeq3( frame_i ).frameType, ...
-            frameTprev1_R, frameTprev2_R ...
-        );
+        if ( ~deferred_execution )
+            
+            SMR_R = psycho( ...
+                frameT_R, ...
+                AACSeq3( frame_i ).frameType, ...
+                frameTprev1_R, frameTprev2_R ...
+            );
+        
+        else
+            
+            % SMR_R retains its last value, thus 3rd frame's SMR ( for
+            % right channel )
+        
+        end
     
         %   - quantize
         [ S, sfc, AACSeq3( frame_i ).chr.G ] = AACquantizer( ...
@@ -182,10 +237,33 @@ function AACSeq3 = AACoder3( fNameIn )
         end
         
         %   - slide Frames
-        frameTprev2_R = frameTprev1_R;
-        frameTprev1_R = frameT_R;
+        if ( ~deferred_execution )
+            
+            frameTprev2_R = frameTprev1_R;
+            frameTprev1_R = frameT_R;
+            
+        end
         
-    end
+        
+        %% Deferred Execution
+        if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
+            % On first loop's end, the 3rd frame has been processed and
+            % thus its SMR can be used for the deferred execution of the 2
+            % preceeding frames. 
+            % So, at this point, we activate the
+            % deferred_execution flag and set the frame index variable to
+            % the last deferred frame, gradually decrementing its value
+            % until 1st deferred frame has been processed.
+            % After that, we deactivate this flag and let the coder proceed
+            % with all unprocessed frames
+            
+            deferred_frame_i = deferred_frame_i - 1;
+            deferred_execution = deferred_frame_i > 0;
+            
+        end
+        
+        
+    end   
     
 end
 

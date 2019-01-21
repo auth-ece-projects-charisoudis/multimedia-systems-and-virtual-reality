@@ -28,8 +28,8 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
 % 
 
     %% Constants
-    WINDOW_LENGTH = length( frameT );
-    ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
+    FRAME_LENGTH = length( frameT );
+    global ON_PREV_MISSING_POLICY   
     
     %% Load Standard's Tables
     %  - B219a: for Long Windows
@@ -68,8 +68,8 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         if ( isempty( hann_window_short ) )
            
-            hann_window_short = hann( 2 * WINDOW_LENGTH / 8 );
-            hann_window_short = hann_window_short( 1 : WINDOW_LENGTH / 8 );
+            hann_window_short = hann( 2 * FRAME_LENGTH / 8 );
+            hann_window_short = hann_window_short( 1 : FRAME_LENGTH / 8 );
             
         end
         hann_window = hann_window_short;
@@ -78,8 +78,8 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         if ( isempty( hann_window_long ) )
            
-            hann_window_long = hann( 2 * WINDOW_LENGTH );
-            hann_window_long = hann_window_long( 1 : WINDOW_LENGTH );
+            hann_window_long = hann( 2 * FRAME_LENGTH );
+            hann_window_long = hann_window_long( 1 : FRAME_LENGTH );
             
         end
         hann_window = hann_window_long;
@@ -98,15 +98,27 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         % Initial Assignment of previous frames
         switch( ON_PREV_MISSING_POLICY )
             
+            case L3_PSYCHO_MissingPolicies.Defer
+                % Defer computation of first 2 subframes until 3rd's SMR
+                % has been computed. Then copy this result for the
+                % preceding two subframes.
+                SMR( :, 1:2 ) = NaN( length( B219b ), 2 );
+                subframe_i_start = 3;
+                
+                frameTprev1 = subframes( :, 2 );
+                frameTprev2 = subframes( :, 1 );
+                
             case L3_PSYCHO_MissingPolicies.Zeros
                 
                 frameTprev1 = zeros( 256, 1 );
                 frameTprev2 = zeros( 256, 1 );
+                subframe_i_start = 1;
         	
             case L3_PSYCHO_MissingPolicies.SameAsFirst
                 
                 frameTprev1 = subframes( :, 1 );
                 frameTprev2 = subframes( :, 1 );
+                subframe_i_start = 1;
         
             case L3_PSYCHO_MissingPolicies.FromPreviousFrame
                 
@@ -114,11 +126,12 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
                 
                 frameTprev1 = subframes_previous( :, 2 );
                 frameTprev2 = subframes_previous( :, 1 );
+                subframe_i_start = 1;
                 
         end
         
         % Loop through all sub-frames
-        for subframe_i = 1 : 8
+        for subframe_i = subframe_i_start : 8
             
             % Get one new subframe
             frameT = subframes( :, subframe_i );
@@ -135,13 +148,33 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
             
         end
         
+        % Check if Defered execution has been selected
+        if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
+           
+            SMR( :, 1 ) = SMR( :, 3 );
+            SMR( :, 2 ) = SMR( :, 3 );
+            
+        end            
+        
     else
         
         % Check if previous frames exist
-        if ( ~ any( frameTprev1 ~= 0 ) )
+        if ( L3_PSYCHO_MissingPolicies.Defer )
+            % Defer computation of first 2 frames until 3rd's SMR has been
+            % computed. Then copy this result for the first two
+            
+            
+        elseif ( ~ any( frameTprev1 ~= 0 ) )
             % Both previous frames missing
                         
             switch( ON_PREV_MISSING_POLICY )
+                
+                case L3_PSYCHO_MissingPolicies.Defer
+                    % Defer computation of first 2 frames until 3rd's SMR
+                    % has been computed. Then copy this result for the
+                    % preceding two frames.
+                    SMR = NaN( length( B219a ), 1 );
+                    return
             
                 case L3_PSYCHO_MissingPolicies.SameAsFirst
 
@@ -159,6 +192,13 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
             % One previous frame missing
             
             switch( ON_PREV_MISSING_POLICY )
+                
+                case L3_PSYCHO_MissingPolicies.Defer
+                    % Defer computation of first 2 frames until 3rd's SMR
+                    % has been computed. Then copy this result for the
+                    % preceding two frames.
+                    SMR = NaN( length( B219a ), 1 );
+                    return
             
                 case L3_PSYCHO_MissingPolicies.SameAsFirst
 
