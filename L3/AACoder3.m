@@ -46,7 +46,7 @@ function AACSeq3 = AACoder3( fNameIn )
     global ON_PREV_MISSING_POLICY
     if ( isempty( ON_PREV_MISSING_POLICY ) )
         
-        ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;
+        ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
         
     end
 
@@ -93,7 +93,7 @@ function AACSeq3 = AACoder3( fNameIn )
     deferred_execution = false;
     for frame_i = frame_i
         
-        sprintf( '%d', frame_i );
+        sprintf( '\t- frame: #%03d', frame_i )
         
         %% Left Channel
         %   - save frame in time

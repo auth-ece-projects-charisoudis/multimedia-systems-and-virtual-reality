@@ -159,12 +159,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
     else
         
         % Check if previous frames exist
-        if ( L3_PSYCHO_MissingPolicies.Defer )
-            % Defer computation of first 2 frames until 3rd's SMR has been
-            % computed. Then copy this result for the first two
-            
-            
-        elseif ( ~ any( frameTprev1 ~= 0 ) )
+        if ( ~ any( frameTprev1 ~= 0 ) )
             % Both previous frames missing
                         
             switch( ON_PREV_MISSING_POLICY )
@@ -214,7 +209,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         % Compute SMR
         SMR = L3_PSYCHO_psycho_mono( ...
-            [ frameT, frameTprev1, frameTprev2 ], ...
+            [ frameT frameTprev1 frameTprev2 ], ...
             spreading_matrix, hann_window, B219a ...
         );
         
