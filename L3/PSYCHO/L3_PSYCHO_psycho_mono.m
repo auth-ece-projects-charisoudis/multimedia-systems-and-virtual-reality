@@ -36,7 +36,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     %% Predictability Measure
     % Predictability for higher part of spectrum is set constant for long
     % frames, equal to 0.4
-    if ( NBANDS > 60 && false )
+    if ( NBANDS > 60 )
         
         c = [ sqrt( ...
             ( r( 1:6 ) .* cos( f( 1:6 ) ) - rpred( 1:6 ) .* cos( fpred( 1:6 ) ) ) .^ 2 + ...

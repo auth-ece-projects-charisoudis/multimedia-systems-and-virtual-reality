@@ -236,7 +236,7 @@ function AACSeq3 = AACoder3( fNameIn )
         end
         
         
-        %% Deferred Execution
+        %% Deferred Execution ( if chosen )
         if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
             % On first loop's end, the 3rd frame has been processed and
             % thus its SMR can be used for the deferred execution of the 2
