@@ -102,11 +102,9 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
                 % Defer computation of first 2 subframes until 3rd's SMR
                 % has been computed. Then copy this result for the
                 % preceding two subframes.
-                SMR( :, 1:2 ) = NaN( length( B219b ), 2 );
-                subframe_i_start = 3;
-                
                 frameTprev1 = subframes( :, 2 );
                 frameTprev2 = subframes( :, 1 );
+                subframe_i_start = 3;
                 
             case L3_PSYCHO_MissingPolicies.Zeros
                 
@@ -131,6 +129,11 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         end
         
         % Loop through all sub-frames
+        if ( AACONFIG.DEBUG )
+            
+            sprintf( '\t\tbefore ESH loop' )
+            
+        end
         for subframe_i = subframe_i_start : 8
             
             % Get one new subframe
@@ -147,6 +150,11 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
             frameTprev1 = frameT;
             
         end
+         if ( AACONFIG.DEBUG )
+            
+            sprintf( '\t\after ESH loop' )
+            
+        end
         
         % Check if Defered execution has been selected
         if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
@@ -154,7 +162,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
             SMR( :, 1 ) = SMR( :, 3 );
             SMR( :, 2 ) = SMR( :, 3 );
             
-        end            
+        end          
         
     else
         

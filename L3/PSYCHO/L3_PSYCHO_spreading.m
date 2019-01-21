@@ -29,7 +29,7 @@ function sf = L3_PSYCHO_spreading( frameType )
         
         for bj = 1 : Nb
         
-            sf( bi, bj ) = L3_PSYCHO_SPREADING_cell( bval, bi, bj );
+            sf( bi, bj ) = L3_PSYCHO_SPREADING_cell( bval( bi ), bval( bj ) );
             
         end
         

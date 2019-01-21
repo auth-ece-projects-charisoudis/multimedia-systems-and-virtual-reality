@@ -39,7 +39,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     
     % Initial Approximation Step
     a0 = ( 16 / 3 ) * log2( max( frame ) ^ 0.75 / MQ );
-    a( : ) = a0 - 1;
+    a( : ) = a0;
     
     % Optimization Step
     for b = 1 : NBANDS
@@ -51,7 +51,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         Pe = T( b );
         Sb_q = zeros( whigh - wlow + 1, 1 );
 
-        while ( Pe <= T( b ) && max( abs( diff( a ) ) ) < 60 )
+        while ( Pe <= T( b ) && max( abs( a( b ) - a0 ) ) < 60 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
             a( b ) = a( b ) + 1;
@@ -68,7 +68,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
             % Calculate Quntization Noise Power
             Pe = sumsqr( ...
                 frame( wlow : whigh ) - ...
-                ( L2_TNS_QUANTIZER_sgn( Sb_q ) .* abs( Sb_q ) .^ (4 / 3) ) ...
+                ( L2_TNS_QUANTIZER_sgn( Sb_q ) .*(  abs( Sb_q ) .^ (4 / 3) ) ) ...
                 * 2^( 0.25 * a( b ) ) ...
             );
             
@@ -78,7 +78,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         S( wlow : whigh ) = Sb_q;
         
         % Slide a0
-%         a0 = a( b );
+        a0 = a( b );
         
     end
     

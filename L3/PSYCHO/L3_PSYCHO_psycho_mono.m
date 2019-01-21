@@ -23,8 +23,8 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     frames_fft = fft( frames_windowed, FRAME_LENGTH, 1 );
     
     % Extract norm and angle ( for ( half + 1 ) fft coefficients )
-    r = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
-    f = angle( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
+    r = abs( frames_fft( 1 : FRAME_LENGTH / 2, : ) );
+    f = angle( frames_fft( 1 : FRAME_LENGTH / 2, : ) );
     
     %% Compute prediction
     rpred = 2 * r( :, 2 ) - r( :, 3 );
@@ -33,13 +33,26 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     r = r( :, 1 );
     f = f( :, 1 );
     
-    %% Predictability Measure    
-    c = sqrt( ...
-        ( r .* cos( f ) - rpred .* cos( fpred ) ) .^ 2 + ...
-        ( r .* sin( f ) - rpred .* sin( fpred ) ) .^ 2 ...
-    ) ./ ( r + abs( rpred ) );
+    %% Predictability Measure
+    % Predictability for higher part of spectrum is set constant for long
+    % frames, equal to 0.4
+    if ( NBANDS > 60 && false )
+        
+        c = [ sqrt( ...
+            ( r( 1:6 ) .* cos( f( 1:6 ) ) - rpred( 1:6 ) .* cos( fpred( 1:6 ) ) ) .^ 2 + ...
+            ( r( 1:6 ) .* sin( f( 1:6 ) ) - rpred( 1:6 ) .* sin( fpred( 1:6 ) ) ) .^ 2 ...
+        ) ./ ( r( 1:6 ) + abs( rpred( 1:6 ) ) ); 0.4 * ones( FRAME_LENGTH / 2 - 6, 1 ) ];
+        
+    else
+        
+        c = sqrt( ...
+            ( r .* cos( f ) - rpred .* cos( fpred ) ) .^ 2 + ...
+            ( r .* sin( f ) - rpred .* sin( fpred ) ) .^ 2 ...
+        ) ./ ( r + abs( rpred ) );
+        
+    end
 
-    %% Weighted Predictability Measure
+    %% Band Energy & Weighted Predictability Measure
     e = zeros( NBANDS, 1 );
     cw = zeros( NBANDS, 1 );
     for b = 1 : NBANDS
@@ -54,30 +67,40 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     
     %% Combine Energy & Predictability with Spreading Function
     spreading_matrix_transpose = spreading_matrix';
+    spreading_matrix_colsum( :, 1 ) = sum( spreading_matrix );
     
     ecb = spreading_matrix_transpose * e;
     ct = spreading_matrix_transpose * cw;
     
-    clear spreading_matrix_transpose;
-    
     % Normalize above
     cb = ct ./ ecb;
-    en = ecb ./ ( sum( spreading_matrix )' );
+    en = ecb ./ spreading_matrix_colsum;
     
     %% Tonality Index ( for each band )
+    % tb should be in range ( 0, 1 ) => cb < 0.499 => ecb( b ) > 2 * ct( b
+    % ) for all b
     tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
+    
+%     tb
     
     % Clip tb
 %     tb = abs( tb );
-%     tb( tb > 1 ) = 1 - eps();
-%     
-    assert( max( abs( tb ) ) < 1 )
-    assert( min( abs( tb ) ) > 0 )
+%     tb( tb > 1 ) = 0.5;
+%     tb( tb < 0 ) = 0.5;
+% % 
+%     if( max( tb ) >= 1 || min( tb ) <= 0 )
+%         
+%         plot( 0.5 * ecb - ct )
+%         
+%         tb
+%         assert( false )
+%         
+%     end
     
     %% SNR
-    % TMN( b ) = 6dB constant for all bands
-    % NMT( b ) = 18dB constant for all bands
-    SNR = 6 * tb + 18 * ( 1 - tb );
+    % TMN( b ) = 18dB constant for all bands
+    % NMT( b ) = 6dB constant for all bands
+    SNR = 18 * tb + 6 * ( 1 - tb );
     
     % Convert DB -> Energy Ratio
     bc = 10 .^ ( -0.1 * SNR );
@@ -91,7 +114,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % std_table' bands
     
     % Noise Level
-    qthr_hat = ( eps() * 5 * FRAME_LENGTH ) .^ ( 0.1 * std_table( :, 6 ) );
+    qthr_hat = ( eps() * 0.5 * FRAME_LENGTH ) * ( 10 .^ ( 0.1 * std_table( :, 6 ) ) );
     npart = max( nb, qthr_hat );
     
     %% Compute SMR

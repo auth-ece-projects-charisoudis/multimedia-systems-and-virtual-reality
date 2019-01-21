@@ -1,4 +1,4 @@
-function x = L3_PSYCHO_SPREADING_cell( bval, bi, bj  )
+function x = L3_PSYCHO_SPREADING_cell( bi, bj )
 %L3_PSYCHO_SPREADING_CELL Return the spreading function's value for bands i
 %and j and for the given frame type.
 % 
@@ -10,7 +10,7 @@ function x = L3_PSYCHO_SPREADING_cell( bval, bi, bj  )
 %
     
     %% tmpx
-    tmpx = 1.5 * ( bval( bj ) - bval( bi ) );
+    tmpx = 1.5 * ( bj - bi );
     if ( bi >= bj )
        
         tmpx = 2 * tmpx;
