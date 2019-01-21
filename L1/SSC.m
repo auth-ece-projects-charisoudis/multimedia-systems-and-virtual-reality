@@ -3,6 +3,17 @@ function frameType = SSC( frameT, nextFrameT, prevFrameType )
 %   Finds the frame type for each frame in the frame sequence
 % 
 
+    %% Global Settings
+    global AACONFIG
+    register_config()
+    
+    if ( AACONFIG.L1.SSC_ONLY_LONG_TEST )
+       
+        frameType = L1_SSC_Frametypes.OnlyLong;
+        return
+        
+    end
+
     %% FIX: permute input frames ( 2048x1x2 --> 2048x2 )
     frameT = permute( frameT, [1, 3, 2] );
     nextFrameT = permute( nextFrameT, [1, 3, 2] );

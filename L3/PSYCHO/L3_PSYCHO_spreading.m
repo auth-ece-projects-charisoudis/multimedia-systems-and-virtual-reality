@@ -13,11 +13,13 @@ function sf = L3_PSYCHO_spreading( frameType )
     % Total Bands, Nb
     if ( frameType == L1_SSC_Frametypes.EightShort )
         
-        Nb = size( B219b, 1 );
+        Nb = length( B219b );
+        bval = B219b( :, 5 );
         
     else
         
-        Nb = size( B219a, 1 );
+        Nb = length( B219a );
+        bval = B219a( :, 5 );
         
     end
     
@@ -27,7 +29,7 @@ function sf = L3_PSYCHO_spreading( frameType )
         
         for bj = 1 : Nb
         
-            sf( bi, bj ) = L3_PSYCHO_SPREADING_cell( frameType, bi, bj );
+            sf( bi, bj ) = L3_PSYCHO_SPREADING_cell( bval, bi, bj );
             
         end
         

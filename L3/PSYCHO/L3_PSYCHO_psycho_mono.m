@@ -25,7 +25,6 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % Extract norm and angle ( for ( half + 1 ) fft coefficients )
     r = abs( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
     f = angle( frames_fft( 1 : FRAME_LENGTH / 2 + 1, : ) );
-    clear frames_fft
     
     %% Compute prediction
     rpred = 2 * r( :, 2 ) - r( :, 3 );
@@ -72,8 +71,8 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
 %     tb = abs( tb );
 %     tb( tb > 1 ) = 1 - eps();
 %     
-%     assert( max( tb ) < 1 )
-%     assert( min( tb ) > 0 )
+    assert( max( abs( tb ) ) < 1 )
+    assert( min( abs( tb ) ) > 0 )
     
     %% SNR
     % TMN( b ) = 6dB constant for all bands

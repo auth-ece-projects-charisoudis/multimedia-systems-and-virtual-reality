@@ -1,26 +1,13 @@
-function x = L3_PSYCHO_SPREADING_cell( frameType, bi, bj  )
+function x = L3_PSYCHO_SPREADING_cell( bval, bi, bj  )
 %L3_PSYCHO_SPREADING_CELL Return the spreading function's value for bands i
 %and j and for the given frame type.
 % 
-%   frameType: frame's type
+%   bval: from std_table ( 5th column )
 %   bi: "spreader" band
 %   bj: "spreadee" band
 %
 %   x: spreading function's value for given spreader & spreadee bands
 %
-
-    global B219a
-    global B219b
-    
-    if ( frameType == L1_SSC_Frametypes.EightShort )
-        
-        bval = B219b( :, 5 );
-        
-    else
-        
-        bval = B219a( :, 5 );
-        
-    end
     
     %% tmpx
     tmpx = 1.5 * ( bval( bj ) - bval( bi ) );
