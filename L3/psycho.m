@@ -29,7 +29,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
 
     %% Constants
     FRAME_LENGTH = length( frameT );
-    global ON_PREV_MISSING_POLICY   
+    global AACONFIG 
     
     %% Load Standard's Tables
     %  - B219a: for Long Windows
@@ -96,7 +96,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         subframes = buffer( frameT( 449 : end - 448 ), 256, 128, 'nodelay');
         
         % Initial Assignment of previous frames
-        switch( ON_PREV_MISSING_POLICY )
+        switch( AACONFIG.L3.ON_PREV_MISSING_POLICY )
             
             case L3_PSYCHO_MissingPolicies.Defer
                 % Defer computation of first 2 subframes until 3rd's SMR
@@ -149,7 +149,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         end
         
         % Check if Defered execution has been selected
-        if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
+        if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
            
             SMR( :, 1 ) = SMR( :, 3 );
             SMR( :, 2 ) = SMR( :, 3 );
@@ -162,7 +162,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         if ( ~ any( frameTprev1 ~= 0 ) )
             % Both previous frames missing
                         
-            switch( ON_PREV_MISSING_POLICY )
+            switch( AACONFIG.L3.ON_PREV_MISSING_POLICY )
                 
                 case L3_PSYCHO_MissingPolicies.Defer
                     % Defer computation of first 2 frames until 3rd's SMR
@@ -186,7 +186,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         elseif ( ~ any( frameTprev2 ~= 0 ) )
             % One previous frame missing
             
-            switch( ON_PREV_MISSING_POLICY )
+            switch( AACONFIG.L3.ON_PREV_MISSING_POLICY )
                 
                 case L3_PSYCHO_MissingPolicies.Defer
                     % Defer computation of first 2 frames until 3rd's SMR

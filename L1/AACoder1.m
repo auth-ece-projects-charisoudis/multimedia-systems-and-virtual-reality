@@ -17,6 +17,10 @@ function AACSeq1 = AACoder1( fNameIn )
         WINDOW_SHAPE = 'SIN';
         
     end
+    
+    %% Global Config
+    global AACONFIG
+    register_config()
 
     %% Read wav file
     [y, ~] = audioread( fNameIn );
@@ -37,8 +41,7 @@ function AACSeq1 = AACoder1( fNameIn )
 
     % Check if Level-3 Encoder is running: add frameT to struct as, it will
     % be used in the psychoacoustic modeling stage of the encoder.
-    global LEVEL_3_ENCODER_RUNNING
-    if ( ~isempty( LEVEL_3_ENCODER_RUNNING ) && LEVEL_3_ENCODER_RUNNING )
+    if ( AACONFIG.L1.L3_ENCODER_RUNNING )
         
         for frame_i = 1:NFRAMES
            

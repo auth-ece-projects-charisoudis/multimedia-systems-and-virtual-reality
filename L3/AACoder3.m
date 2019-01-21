@@ -20,33 +20,16 @@ function AACSeq3 = AACoder3( fNameIn )
     end
     
     %% Check for Huffman LUTs' presense in global workspace
-    global LEVEL_3_ENCODER_RUNNING
-    if ( isempty( LEVEL_3_ENCODER_RUNNING ) )
-        
-        LEVEL_3_ENCODER_RUNNING = true;
-        
-    end
+    global AACONFIG
+    register_config()
     
-    global LEVEL_3_ENCODER_HUFFMAN
-    global LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS
-    if ( isempty( LEVEL_3_ENCODER_HUFFMAN ) )
-        
-        LEVEL_3_ENCODER_HUFFMAN = false;
-        LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS = false;
-        
-    end
+    % Inform about L3 codec's execution
+    AACONFIG.L1.L3_ENCODER_RUNNING = true;
     
     global HUFFMAN_LUT
-    if ( LEVEL_3_ENCODER_HUFFMAN && isempty( HUFFMAN_LUT ) )
+    if ( AACONFIG.L3.HUFFMAN_ENCODE && isempty( HUFFMAN_LUT ) )
         
         HUFFMAN_LUT = loadLUT();
-        
-    end
-    
-    global ON_PREV_MISSING_POLICY
-    if ( isempty( ON_PREV_MISSING_POLICY ) )
-        
-        ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
         
     end
 
@@ -63,7 +46,7 @@ function AACSeq3 = AACoder3( fNameIn )
     
     % Psychoaccoustic Model
     %  - initialize    
-    if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
+    if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
         
         frameTprev1_L = AACSeq3( 2 ).chl.frameT;
         frameTprev2_L = AACSeq3( 1 ).chl.frameT;
@@ -72,7 +55,7 @@ function AACSeq3 = AACoder3( fNameIn )
         
         frame_i_start = 3;        
         deferred_frame_i = frame_i_start;
-        frame_i = [ ...
+        frame_indices_sequence = [ ...
             frame_i_start ...
             1 : frame_i_start - 1 ...
             frame_i_start + 1 : NFRAMES ...
@@ -85,15 +68,19 @@ function AACSeq3 = AACoder3( fNameIn )
         frameTprev1_R = zeros( FRAME_LENGTH, 1 );
         frameTprev2_R = zeros( FRAME_LENGTH, 1 );
         
-        frame_i = 1 : NFRAMES;
+        frame_indices_sequence = 1 : NFRAMES;
         
     end
     
     %  - run
     deferred_execution = false;
-    for frame_i = frame_i
+    for frame_i = frame_indices_sequence
         
-        sprintf( '\t- frame: #%03d', frame_i )
+        if ( AACONFIG.DEBUG )
+            
+            sprintf( '\t- frame: #%03d', frame_i )
+            
+        end
         
         %% Left Channel
         %   - save frame in time
@@ -123,14 +110,14 @@ function AACSeq3 = AACoder3( fNameIn )
         );
     
         %   - Huffman encode
-        if ( LEVEL_3_ENCODER_HUFFMAN )
+        if ( AACONFIG.L3.HUFFMAN_ENCODE )
             
             % encode mdcts
             [ AACSeq3( frame_i ).chl.stream, AACSeq3( frame_i ).chl.codebook ] = ...
                 encodeHuff( S, HUFFMAN_LUT );
        
             % encode sfcs
-            if ( LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS )
+            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
             
                 if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
                 
@@ -198,14 +185,14 @@ function AACSeq3 = AACoder3( fNameIn )
         );
     
         %   - Huffman encode
-        if ( LEVEL_3_ENCODER_HUFFMAN )
+        if ( AACONFIG.L3.HUFFMAN_ENCODE )
             
             % encode mdcts
             [ AACSeq3( frame_i ).chr.stream, AACSeq3( frame_i ).chr.codebook ] = ...
                 encodeHuff( S, HUFFMAN_LUT );
        
             % encode sfcs
-            if ( LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS )
+            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
             
                 if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
                 
@@ -246,7 +233,7 @@ function AACSeq3 = AACoder3( fNameIn )
         
         
         %% Deferred Execution
-        if ( ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
+        if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
             % On first loop's end, the 3rd frame has been processed and
             % thus its SMR can be used for the deferred execution of the 2
             % preceeding frames. 
@@ -263,7 +250,10 @@ function AACSeq3 = AACoder3( fNameIn )
         end
         
         
-    end   
+    end
+    
+    % Inform about L3 codec's execution
+    AACONFIG.L1.L3_ENCODER_RUNNING = false;
     
 end
 

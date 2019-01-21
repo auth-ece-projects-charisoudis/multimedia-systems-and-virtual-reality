@@ -21,11 +21,13 @@ function x = iAACoder3( AACSeq3, fNameOut )
         
     end
 
+    %% Global Config
+    global AACONFIG
+    register_config()
+    
     %% Check for Huffman LUTs' presense in global workspace
-    global LEVEL_3_ENCODER_HUFFMAN
-    global LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS
     global HUFFMAN_LUT
-    if ( LEVEL_3_ENCODER_HUFFMAN && isempty( HUFFMAN_LUT ) )
+    if ( AACONFIG.L3.HUFFMAN_ENCODE && isempty( HUFFMAN_LUT ) )
         
         HUFFMAN_LUT = loadLUT();
         
@@ -40,7 +42,7 @@ function x = iAACoder3( AACSeq3, fNameOut )
        
         % Left Channel        
         %   - Huffman decode
-        if ( LEVEL_3_ENCODER_HUFFMAN )
+        if ( AACONFIG.L3.HUFFMAN_ENCODE )
 
             % decode mdcts
             S = decodeHuff( ...
@@ -50,7 +52,7 @@ function x = iAACoder3( AACSeq3, fNameOut )
             )';
         
             % decode sfcs
-            if ( LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS )
+            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
                 
                 sfc = decodeHuff( AACSeq3( frame_i ).chl.sfc, 12, HUFFMAN_LUT );
                 
@@ -74,7 +76,7 @@ function x = iAACoder3( AACSeq3, fNameOut )
 
         % Right Channel
         %   - Huffman decode
-        if ( LEVEL_3_ENCODER_HUFFMAN )
+        if ( AACONFIG.L3.HUFFMAN_ENCODE )
             
             % decode mdcts
             S = decodeHuff( ...
@@ -84,7 +86,7 @@ function x = iAACoder3( AACSeq3, fNameOut )
             );
         
             % decode sfcs
-            if ( LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS )
+            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
                 
                 sfc = decodeHuff( AACSeq3( frame_i ).chr.sfc, 12, HUFFMAN_LUT );
                 

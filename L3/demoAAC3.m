@@ -12,13 +12,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     NSAMPLES = length( y );
     
     %% Global Settings
-    global LEVEL_3_ENCODER_RUNNING
-    LEVEL_3_ENCODER_RUNNING = true;
-    
-    global LEVEL_3_ENCODER_HUFFMAN
-    global LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS
-    LEVEL_3_ENCODER_HUFFMAN = true;
-    LEVEL_3_ENCODER_HUFFMAN_CODE_SFCS = false;
+    register_config()
 
     %% Start!
     clearvars -except fNameIn fNameOut y NSAMPLES FS;
