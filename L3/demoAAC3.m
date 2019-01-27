@@ -15,6 +15,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     register_config()
 
     %% Start!
+    clear global
     clearvars -except fNameIn fNameOut y NSAMPLES FS;
     clc
     tic

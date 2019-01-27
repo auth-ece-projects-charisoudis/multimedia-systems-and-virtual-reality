@@ -12,6 +12,7 @@ function SNR = demoAAC1( fNameIn, fNameOut )
     y = [ y; zeros( 1024 - rem( size( y, 1 ), 1024 ), 2 ) ];
 
     %% Start!
+    clear global
     clearvars -except fNameIn fNameOut y;
     clc
     tic

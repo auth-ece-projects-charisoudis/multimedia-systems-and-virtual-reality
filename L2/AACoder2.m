@@ -7,9 +7,6 @@ function AACSeq2 = AACoder2( fNameIn )
 %   frames
 % 
 
-    %% Level-1 Encoder
-    AACSeq1 = AACoder1( fNameIn );
-    
     %% Check for tables' presence in global workspace
     global B219a
     global B219b
@@ -22,28 +19,31 @@ function AACSeq2 = AACoder2( fNameIn )
         
     end
     
+    %% Level-1 Encoder
+    AACSeq1 = AACoder1( fNameIn );
+    
     %% Level-2 Encoder
     % Get number of frames
     NFRAMES = size( AACSeq1, 1 );
     
     % Initialize output struct
     AACSeq2 = AACSeq1;
-    
+
     % Apply TNS
     for frame_i = 1 : NFRAMES
-       
+
         % Left Channel
         [AACSeq2( frame_i ).chl.frameF, AACSeq2( frame_i ).chl.TNScoeffs] = TNS( ...
             AACSeq2( frame_i ).chl.frameF, ...
             AACSeq2( frame_i ).frameType ...
         );
-    
+
         % Right Channel
         [AACSeq2( frame_i ).chr.frameF, AACSeq2( frame_i ).chr.TNScoeffs] = TNS( ...
             AACSeq2( frame_i ).chr.frameF, ...
             AACSeq2( frame_i ).frameType ...
         );
-        
+
     end
     
 end

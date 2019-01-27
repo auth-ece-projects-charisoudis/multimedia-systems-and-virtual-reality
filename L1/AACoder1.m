@@ -58,7 +58,7 @@ function AACSeq1 = AACoder1( fNameIn )
     end
 
     %% SSC: Find frame Type
-    % first frame - only right half has non-zero values - is set arbitarily to
+    % first frame ( only right half has non-zero values ) is set arbitarily to
     % OnlyLong
     AACSeq1( 1 ).frameType = L1_SSC_Frametypes.OnlyLong;
     for frame_i = 2: NFRAMES - 1
