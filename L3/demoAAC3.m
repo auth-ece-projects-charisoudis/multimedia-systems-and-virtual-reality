@@ -30,7 +30,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     y_out = y_out( 1 : NSAMPLES, : );
     
     % Write Codec's output to file
-    if( nargout == 0 || true )
+    if( nargout == 0 )
        
         audiowrite( fNameOut, y_out, FS );
         
