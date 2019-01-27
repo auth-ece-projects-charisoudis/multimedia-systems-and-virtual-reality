@@ -1,5 +1,5 @@
 function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
-%DEMOAAC2 Executes Level-3 AAC Codec and calculates SNR
+%DEMOAAC3 Executes Level-3 AAC Codec and calculates SNR
 %   
 %   fNameIn: input wav's filename
 %   fNameOut: output wav's filename
