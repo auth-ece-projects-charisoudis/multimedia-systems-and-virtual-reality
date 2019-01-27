@@ -49,7 +49,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         whigh = std_table( b, 3 ) + 1;
         
         Pe = T( b );
-        while ( Pe <= T( b ) && max( abs( a( b ) - a0 ) ) < 60 )
+        while ( Pe <= T( b ) && max( abs( a( b ) - a0 ) ) <= 60 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
             a( b ) = a( b ) + 1;
@@ -80,7 +80,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
                 ( 2^( -0.25 * a( b ) ) * abs( frame( wlow : whigh ) ) ) ...
                 .^ 0.75 + MagicNumber ...
             ) ...
-        ;
+        ; 
         
         % Slide a0
         a0 = a( b );
