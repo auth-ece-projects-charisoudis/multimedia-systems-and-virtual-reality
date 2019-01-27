@@ -15,8 +15,8 @@ function wn = L1_FILTERBANK_WINDOW_oaa( window_shape, window_size, window_param 
             
             % Kaiser-Bessel-derived (KBD) window function ( alpha = {window_param} )
             wn = kaiser( window_size / 2 + 1, window_param * pi );
-            tmp = cumsum(  wn(  1 : window_size / 2 )  );
-            wn = sqrt( [ tmp; tmp( window_size / 2 : -1 : 1 ) ] ./ sum( wn ) );
+            wn_cs = cumsum(  wn(  1 : window_size / 2 )  );
+            wn = sqrt( [ wn_cs; wn_cs( window_size / 2 : -1 : 1 ) ] ./ sum( wn ) );
             
         case 'SIN'
             
