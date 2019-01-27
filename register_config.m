@@ -1,5 +1,5 @@
 function register_config()
-%REGISTER_CONFIG Register execution configuration struct in the global
+%REGISTER_CONFIG Registers execution configuration struct in the global
 %variables' workspace.
 %
 
