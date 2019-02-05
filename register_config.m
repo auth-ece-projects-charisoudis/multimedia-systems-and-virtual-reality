@@ -1,7 +1,6 @@
 function register_config()
 %REGISTER_CONFIG Registers execution configuration struct in the global
 %variables' workspace.
-%
 
     global AACONFIG
     
