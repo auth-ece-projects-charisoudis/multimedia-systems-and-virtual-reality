@@ -9,7 +9,7 @@ function Xk = L1_FILTERBANK_MDCT_mdct( xn )
 %       1) that the signal is real values ( half values
 %   as real and half as imaginary before FFT -> N/2 FFT ) 
 %       2) that values are symmetrical ( ends up using N/4 point DFT and
-%       thus FFT ) which eventually yields complexity �?( N/4*lg(N/4) + O(N)
+%       thus FFT ) which eventually yields complexity Θ( N/4*lg(N/4) + O(N)
 %       ). For more info, see M.Bosi, "Analysis/synthesis system with efficient 
 %       oddly stacked single-band TDAC", Patent No. 5,890,106, March 1999
 %
