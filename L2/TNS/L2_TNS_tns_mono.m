@@ -63,6 +63,10 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     TNScoeffs = L2_TNS_QUANTIZER_uniform_midrise( A( 2 : end ), 4, 0.1 );
     
     %% Filter Initial MDCT Coeffs
+    % Check if filter is stable
+    assert( isstable( 1, [1; TNScoeffs] ) )
+    
+    % Perform the actual filtering
     frameFout = filter( 1, [1; TNScoeffs], frameFin );
     
 end

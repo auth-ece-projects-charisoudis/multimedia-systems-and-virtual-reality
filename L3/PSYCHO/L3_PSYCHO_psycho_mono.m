@@ -81,22 +81,6 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % ) for all b
     tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
     
-%     tb
-    
-    % Clip tb
-%     tb = abs( tb );
-%     tb( tb > 1 ) = 0.5;
-%     tb( tb < 0 ) = 0.5;
-% % 
-%     if( max( tb ) >= 1 || min( tb ) <= 0 )
-%         
-%         plot( 0.5 * ecb - ct )
-%         
-%         tb
-%         assert( false )
-%         
-%     end
-    
     %% SNR
     % TMN( b ) = 18dB constant for all bands
     % NMT( b ) = 6dB constant for all bands

@@ -11,6 +11,10 @@ function frameFout = L2_TNS_itns_mono( frameFin, TNScoeffs )
 %     return
 
     %% Un-Filter produced MDCT Coeffs to reconstruct original
+    % Check if filter is stable
+    assert( isstable( [1; TNScoeffs], 1 ) )
+    
+    % Perform the actual reverse-filtering
     frameFout = filter( [1; TNScoeffs], 1, frameFin );    
     
 end

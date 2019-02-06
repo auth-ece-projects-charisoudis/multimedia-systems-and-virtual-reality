@@ -16,6 +16,15 @@ function xn = L1_FILTERBANK_MDCT_imdct( Xk )
 % ----------------------------------------------------------
 %
 
+%% Check if Marios Athineos's method selected
+global AACONFIG
+if ( ~isempty( AACONFIG ) && strcmp( AACONFIG.L1.MDCT_METHOD, 'marios' ) )
+   
+    xn = imdct4( Xk );
+    return
+    
+end
+
 %% Constants
 K = size( Xk, 1);
 N = K * 2;

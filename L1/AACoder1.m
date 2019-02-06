@@ -20,7 +20,7 @@ function AACSeq1 = AACoder1( fNameIn )
     
     %% Global Config
     global AACONFIG
-    register_config()
+    register_config( ConfSets.Marios )
 
     %% Read wav file
     [y, ~] = audioread( fNameIn );

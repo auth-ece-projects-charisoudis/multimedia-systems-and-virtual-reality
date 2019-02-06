@@ -10,9 +10,6 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     %% Get y for SNR calculation
     [ y, FS ] = audioread( fNameIn );
     NSAMPLES = length( y );
-    
-    %% Global Settings
-    register_config()
 
     %% Start!
     clear global
