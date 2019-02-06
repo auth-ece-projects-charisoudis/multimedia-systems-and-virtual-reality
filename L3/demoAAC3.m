@@ -1,4 +1,4 @@
-function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
+function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
 %DEMOAAC3 Executes Level-3 AAC Codec and calculates SNR
 %   
 %   fNameIn: input wav's filename
@@ -10,15 +10,21 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut )
     %% Get y for SNR calculation
     [ y, FS ] = audioread( fNameIn );
     NSAMPLES = length( y );
+    
+    if ( nargin == 2 )
+        
+       confset = ConfSets.Default; 
+        
+    end
 
     %% Start!
     clear global
-    clearvars -except fNameIn fNameOut y NSAMPLES FS;
+    clearvars -except fNameIn fNameOut y NSAMPLES FS confset;
     clc
     tic
     
     %% Encoder
-    AACSeq3 = AACoder3( fNameIn );
+    AACSeq3 = AACoder3( fNameIn, confset );
     
     %% Decoder
     y_out = iAACoder3( AACSeq3, fNameOut );

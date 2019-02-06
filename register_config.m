@@ -14,7 +14,7 @@ function register_config( confset )
     global AACONFIG AACONFSET
 
     % Configuration set
-    if ( nargin ==0 || isempty( confset ) )
+    if ( nargin == 0 || isempty( confset ) )
 
         if ( isempty( AACONFSET ) )
         
@@ -38,8 +38,8 @@ function register_config( confset )
                 'SSC_ONLY_LONG_TEST', false, ...
                 'L3_ENCODER_RUNNING', false, ...
                 'SNR', struct( ...
-                    'COMPUTE_METHOD', 'default', ...    % default or builtin
-                    'MEAN_METHOD', 'mean' ...           % mean or rms
+                    'COMPUTE_METHOD', 'builtin', ...    % default or builtin
+                    'MEAN_METHOD', 'rms' ...            % mean or rms
                 ) ...
             ), ...
             'L2', struct( ...
@@ -47,7 +47,7 @@ function register_config( confset )
             ), ...
             'L3', struct( ...
                 'HUFFMAN_ENCODE', false, ...
-                'HUFFMAN_ENCODE_SFCS', false, ...
+                'HUFFMAN_ENCODE_SFCS', true, ...
                 'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.SameAsFirst ...
             ) ...
         );
@@ -55,24 +55,24 @@ function register_config( confset )
         % Per configuration-set settings
         switch confset
 
-            case 1
+            case ConfSets.Default
                 AACONFIG.L1.MDCT_METHOD = 'default';
                 AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.SameAsFirst;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
 
-            case 2
+            case ConfSets.Default_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'default';
                 AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.SameAsFirst;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;
 
-            case 3
+            case ConfSets.Marios
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
                 AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;
 
-            case 4
+            case ConfSets.Marios_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
                 AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;

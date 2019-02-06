@@ -38,76 +38,73 @@ function x = iAACoder3( AACSeq3, fNameOut )
 
     %% Dequantize MDCT Coefficients
     AACSeq2 = AACSeq3;
-    for frame_i = 1 : NFRAMES
-       
-        % Left Channel        
-        %   - Huffman decode
-        if ( AACONFIG.L3.HUFFMAN_ENCODE )
+    for channel = 'lr'
 
-            % decode mdcts
-            S = decodeHuff( ...
-                AACSeq3( frame_i ).chl.stream, ...
-                AACSeq3( frame_i ).chl.codebook, ...
-                HUFFMAN_LUT ...
-            )';
-        
-            % decode sfcs
-            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
-                
-                sfc = decodeHuff( AACSeq3( frame_i ).chl.sfc, 12, HUFFMAN_LUT );
-                
+        for frame_i = 1 : NFRAMES
+
+            % Per Channel Operations
+            %   - Huffman decode
+            if ( AACONFIG.L3.HUFFMAN_ENCODE )
+
+                % decode mdcts
+                S = decodeHuff( ...
+                    AACSeq3( frame_i ).(['ch' channel]).stream, ...
+                    AACSeq3( frame_i ).(['ch' channel]).codebook, ...
+                    HUFFMAN_LUT ...
+                )';
+
+                % decode sfcs
+                if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
+
+                    if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
+
+                        sfc = zeros( 42, 8 );
+                        for subframe_i = 1 : 8
+
+                            sfc( :, subframe_i ) = decodeHuff( ...
+                                convertStringsToChars( ...
+                                    AACSeq3( frame_i ).(['ch' channel]).sfc( subframe_i ) ...
+                                ), ...
+                                12, HUFFMAN_LUT ...
+                            );
+                        
+                            % Restore G
+                            sfc( 1, subframe_i ) = AACSeq3( frame_i ).(['ch' channel]).G( subframe_i );
+
+                        end
+
+                    else
+
+                        sfc = decodeHuff( ...
+                            AACSeq3( frame_i ).(['ch' channel]).sfc, ...
+                            12, HUFFMAN_LUT ...
+                        );
+                        
+                        % Restore G
+                        sfc( 1 ) = AACSeq3( frame_i ).(['ch' channel]).G;
+
+                    end
+
+                else
+
+                    sfc = AACSeq3( frame_i ).(['ch' channel]).sfc;
+
+                end
+
             else
-                
-                sfc = AACSeq3( frame_i ).chl.sfc;
-                
-            end
-            
-        else
-           
-            S = AACSeq3( frame_i ).chl.stream;
-            sfc = AACSeq3( frame_i ).chl.sfc;
-            
-        end
-        
-        %   - dequantize
-        AACSeq2( frame_i ).chl.frameF = iAACquantizer( ...
-            S, sfc, AACSeq3( frame_i ).chl.G, AACSeq3( frame_i ).frameType ...
-        );
 
-        % Right Channel
-        %   - Huffman decode
-        if ( AACONFIG.L3.HUFFMAN_ENCODE )
-            
-            % decode mdcts
-            S = decodeHuff( ...
-                AACSeq3( frame_i ).chr.stream, ...
-                AACSeq3( frame_i ).chr.codebook, ...
-                HUFFMAN_LUT ...
+                S = AACSeq3( frame_i ).(['ch' channel]).stream;
+                sfc = AACSeq3( frame_i ).(['ch' channel]).sfc;
+
+            end
+
+            %   - dequantize
+            AACSeq2( frame_i ).(['ch' channel]).frameF = iAACquantizer( ...
+                S, sfc, AACSeq3( frame_i ).(['ch' channel]).G, AACSeq3( frame_i ).frameType ...
             );
-        
-            % decode sfcs
-            if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
-                
-                sfc = decodeHuff( AACSeq3( frame_i ).chr.sfc, 12, HUFFMAN_LUT );
-                
-            else
-                
-                sfc = AACSeq3( frame_i ).chr.sfc;
-                
-            end
-            
-        else
-           
-            S = AACSeq3( frame_i ).chr.stream;
-            sfc = AACSeq3( frame_i ).chr.sfc;
-            
-        end
-        
-        %   - dequantize
-        AACSeq2( frame_i ).chr.frameF = iAACquantizer( ...
-            S, sfc, AACSeq3( frame_i ).chr.G, AACSeq3( frame_i ).frameType ...
-        );
 
+        end
+    
     end
     
     %% Level-2 Decoder

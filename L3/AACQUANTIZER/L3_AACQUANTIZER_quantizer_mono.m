@@ -38,7 +38,8 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     a = zeros( NBANDS, 1 );
     
     % Initial Approximation Step
-    a( : ) = ( 16 / 3 ) * log2( max( frame ) ^ 0.75 / MQ );
+    a0 = ( 16 / 3 ) * log2( max( frame ) ^ 0.75 / MQ );
+    a( : ) = a0;
     
     % Optimization Step
     for b = 1 : NBANDS
@@ -51,7 +52,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         while ( Pe <= T( b ) && max( abs( diff( a ) ) ) <= 60 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
-            a( b ) = a( b ) + 1;
+            a( b ) = a( b ) + 1.0;
 
             % Quantize frame coefficients        
             Sb_q = ...
