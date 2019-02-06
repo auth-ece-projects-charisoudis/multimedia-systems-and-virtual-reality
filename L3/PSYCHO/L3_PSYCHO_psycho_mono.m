@@ -81,6 +81,10 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % ) for all b
     tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
     
+    % Clip indeces ( tonality index should be in range [0,1] )
+    tb( tb > 1 ) = 1;
+    tb( tb < 0 ) = 0;
+    
     %% SNR
     % TMN( b ) = 18dB constant for all bands
     % NMT( b ) = 6dB constant for all bands

@@ -61,7 +61,7 @@ function register_config( confset )
                 AACONFIG.L1.MDCT_METHOD = 'default';
                 AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.SameAsFirst;
 
             case ConfSets.Default_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'default';
