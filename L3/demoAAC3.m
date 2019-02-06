@@ -5,17 +5,18 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
 %   fNameOut: output wav's filename
 %   
 %   SNR: codec's SNR
-%   
+%
 
-    %% Get y for SNR calculation
-    [ y, FS ] = audioread( fNameIn );
-    NSAMPLES = length( y );
-    
+    % Set confset if none selected
     if ( nargin == 2 )
         
        confset = ConfSets.Default; 
         
     end
+
+    %% Get y for SNR calculation
+    [ y, FS ] = audioread( fNameIn );
+    NSAMPLES = length( y );
 
     %% Start!
     clear global

@@ -57,19 +57,36 @@ function x = iAACoder3( AACSeq3, fNameOut )
                 if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
 
                     if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-
-                        sfc = zeros( 42, 8 );
-                        for subframe_i = 1 : 8
-
-                            sfc( :, subframe_i ) = decodeHuff( ...
-                                convertStringsToChars( ...
-                                    AACSeq3( frame_i ).(['ch' channel]).sfc( subframe_i ) ...
-                                ), ...
-                                12, HUFFMAN_LUT ...
-                            );
                         
-                            % Restore G
-                            sfc( 1, subframe_i ) = AACSeq3( frame_i ).(['ch' channel]).G( subframe_i );
+                        sfc = zeros( 42, 8 );
+                        if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS_COMBINED )
+
+                            % Split decoded sfcs
+                            sfc = buffer( decodeHuff( ...
+                                AACSeq3( frame_i ).(['ch' channel]).sfc, ...
+                                12, HUFFMAN_LUT ...
+                            ), 42 );
+                            
+                        else
+
+                            for subframe_i = 1 : 8
+
+                                sfc( :, subframe_i ) = decodeHuff( ...
+                                    convertStringsToChars( ...
+                                        AACSeq3( frame_i ).(['ch' channel]).sfc( subframe_i ) ...
+                                    ), ...
+                                    12, HUFFMAN_LUT ...
+                                );
+
+                            end
+                        
+                        end
+                        
+                        % Restore G
+                        for subframe_i = 1 : 8
+                            
+                            sfc( 1, subframe_i ) = ...
+                                AACSeq3( frame_i ).(['ch' channel]).G( subframe_i );
 
                         end
 

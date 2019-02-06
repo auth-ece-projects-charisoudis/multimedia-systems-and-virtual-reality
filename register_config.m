@@ -48,11 +48,12 @@ function register_config( confset )
             'L3', struct( ...
                 'HUFFMAN_ENCODE', false, ...
                 'HUFFMAN_ENCODE_SFCS', true, ...
+                'HUFFMAN_ENCODE_SFCS_COMBINED', true, ...
                 'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.SameAsFirst ...
             ) ...
         );
     
-        % Per configuration-set settings
+        % Configuration sets
         switch confset
 
             case ConfSets.Default
@@ -65,7 +66,7 @@ function register_config( confset )
                 AACONFIG.L1.MDCT_METHOD = 'default';
                 AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Defer;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
 
             case ConfSets.Marios
                 AACONFIG.L1.MDCT_METHOD = 'marios';

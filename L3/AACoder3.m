@@ -128,19 +128,35 @@ function AACSeq3 = AACoder3( fNameIn, confset )
                 if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
 
                     if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-
-                        AACSeq3( frame_i ).(['ch' channel]).sfc = strings( 8, 1 );
+                        
+                        % Round first sfc for each subframe
                         for subframe_i = 1 : 8
 
                             % Cast sfc to unsigned 8bit integer
                             sfc( 1, subframe_i ) = cast( ...
                                 floor( sfc( 1, subframe_i ) ), 'uint8' ...
                             );
+                            
+                        end
+                        
+                        % Huffman encode
+                        if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS_COMBINED )
 
-                            % Get huffman bit-sequence
-                            AACSeq3( frame_i ).(['ch' channel]).sfc( :, subframe_i ) = ...
-                                encodeHuff( sfc( :, subframe_i ), HUFFMAN_LUT, 12 );
+                            % Combine sfcs
+                            AACSeq3( frame_i ).(['ch' channel]).sfc = ...
+                                encodeHuff( sfc( : ), HUFFMAN_LUT, 12 );
+                            
+                        else
 
+                            AACSeq3( frame_i ).(['ch' channel]).sfc = strings( 8, 1 );
+                            for subframe_i = 1 : 8
+
+                                % Get huffman bit-sequence
+                                AACSeq3( frame_i ).(['ch' channel]).sfc( :, subframe_i ) = ...
+                                    encodeHuff( sfc( :, subframe_i ), HUFFMAN_LUT, 12 );
+
+                            end
+                        
                         end
 
                     else
