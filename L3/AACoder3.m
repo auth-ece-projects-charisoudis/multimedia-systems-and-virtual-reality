@@ -21,7 +21,7 @@ function AACSeq3 = AACoder3( fNameIn )
     
     %% Check for Huffman LUTs' presense in global workspace
     global AACONFIG
-    register_config( ConfSets.Default )
+    register_config( ConfSets.Marios_Huffman )
     
     % Inform about L3 codec's execution
     AACONFIG.L1.L3_ENCODER_RUNNING = true;

@@ -9,6 +9,7 @@ function register_config( confset )
 %               - 4: marios mdct, zeros missing policy, huffman encode
 %            If no confset selected ( nargin = 0 ) then the 1st is
 %            automatically selected.
+% 
 
     global AACONFIG AACONFSET
 
