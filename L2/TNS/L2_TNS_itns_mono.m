@@ -18,4 +18,3 @@ function frameFout = L2_TNS_itns_mono( frameFin, TNScoeffs )
     frameFout = filter( [1; TNScoeffs], 1, frameFin );    
     
 end
-
