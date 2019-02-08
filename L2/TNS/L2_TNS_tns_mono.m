@@ -11,33 +11,28 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
 %     frameFout = frameFin;
 %     TNScoeffs = zeros( 4, 1 );
 %     
-%     return
 
-    %% Calculate Band Energies
+    %% Constants
     NBANDS = size( std_table, 1 );
-    P = zeros( NBANDS, 1 );
-    for j = 1:NBANDS
-       
-        P( j ) = sumsqr( frameFin( ...
-                std_table( j, 2 ) + 1 : std_table( j, 3 ) + 1 ...
-            ) ...
-        );
-        
-    end
-
-    %% Normalization Coefficients
     NCOEFFS = length( frameFin );
+
+    %% Calculate Normalization Coefficients
+    P = zeros( NBANDS, 1 );
     Sw = zeros( NCOEFFS, 1 );
-    for k = 1:NCOEFFS
-       
-        % 1) Find the band  of the coefficient
-        [ ~, j ] = min( abs( std_table( :, 2 ) - ( k - 1 ) ) );
-        
-        % 2) Calculate coefficient
-        Sw( k ) = 1 / sqrt( P ( j ) );
-        
+    for j = 1:NBANDS
+
+        klow = std_table( j, 2 ) + 1;
+        khigh = std_table( j, 3 ) + 1;
+
+        % Band Energy
+        P( j ) = sumsqr( frameFin( klow : khigh ) );
+
+        % Normalizing Coefficients for this Band
+        Sw( klow : khigh ) = 1 / sqrt( P ( j ) );
+
     end
     
+    %% Process Normalization Coefficients
     % Back-Smoothing
     for k = NCOEFFS-1:-1:1
        
@@ -56,18 +51,25 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     Xw = frameFin ./ Sw;
     
     %% Linear Predictor Coefficients
-    % Compute
-    A = lpc( Xw, 4 );
+%     % Compute directly via lpc
+%     A = lpc( Xw, 4 );
+    % Calculate auto-correlation matrix
+    r = xcorr( Xw );
+    % Solve normal equations
+    A = levinson( r( length( frameFin ) : end ), 4 );
     
     % Quantize
     TNScoeffs = L2_TNS_QUANTIZER_uniform_midrise( A( 2 : end ), 4, 0.1 );
     
     %% Filter Initial MDCT Coeffs
-    % Check if filter is stable
-    assert( isstable( 1, [1; TNScoeffs] ) )
+    % Set numerator denominator coefs
+    num = [1; TNScoeffs];
+    denom = 1;
+    
+    % Check if INVERSE filter is stable
+    assert( isstable( denom, num ) )
     
     % Perform the actual filtering
-    frameFout = filter( 1, [1; TNScoeffs], frameFin );
+    frameFout = filter( num, denom, frameFin );
     
 end
-

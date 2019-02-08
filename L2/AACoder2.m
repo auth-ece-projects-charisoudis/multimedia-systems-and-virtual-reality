@@ -31,7 +31,7 @@ function AACSeq2 = AACoder2( fNameIn )
 
     % Apply TNS
     for frame_i = 1 : NFRAMES
-
+        
         % Left Channel
         [AACSeq2( frame_i ).chl.frameF, AACSeq2( frame_i ).chl.TNScoeffs] = TNS( ...
             AACSeq2( frame_i ).chl.frameF, ...
