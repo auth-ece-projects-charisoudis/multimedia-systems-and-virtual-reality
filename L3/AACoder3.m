@@ -2,10 +2,19 @@ function AACSeq3 = AACoder3( fNameIn, confset )
 %AACODER3 Level-3 AAC Encoder
 %   
 %   fNameIn: wav file's name ( on which the AAC Coder will be executed )
+%   confset: execution configuration parameters as one of the pre-defined
+%   configuration sets ( see ConfSets class )
 % 
 %   AACSeq3: Level-3 output struct containing info for each of the coder's
 %   frames
 % 
+
+    % Configuration Set
+    if ( nargin == 1 )
+        
+       confset = ConfSets.Default;
+        
+    end
 
     %% Check for tables' presence in global workspace
     global B219a
@@ -16,12 +25,6 @@ function AACSeq3 = AACoder3( fNameIn, confset )
         
         B219a = S.B219a;
         B219b = S.B219b;
-        
-    end
-    
-    if ( nargin == 1 )
-        
-       confset = ConfSets.Default;
         
     end
     

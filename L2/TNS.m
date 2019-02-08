@@ -39,7 +39,7 @@ function [ frameFout, TNScoeffs ] = TNS( frameFin, frameType )
             
         otherwise
             
-            % All long-type frames
+            % All long-typed frames
             [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, B219a );
             
     end

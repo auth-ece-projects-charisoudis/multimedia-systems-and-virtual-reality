@@ -10,28 +10,23 @@ function x = iAACoder2( AACSeq2, fNameOut )
 % 
 
     %% Constants
-    NCHANNELS = 2;
     NFRAMES = size( AACSeq2, 1 );
-    WINDOW_LENGTH = 2 * size( AACSeq2(1).chl.frameF, 1 );
-
+    
     %% Inverse TNS
     AACSeq1 = AACSeq2;
-    for frame_i = 1 : NFRAMES
+    for channel = 'lr'
+        
+        for frame_i = 1 : NFRAMES
 
-        % Left Channel
-        AACSeq1( frame_i ).chl.frameF = iTNS( ...
-            AACSeq2( frame_i ).chl.frameF, ...
-            AACSeq2( frame_i ).frameType, ...
-            AACSeq2( frame_i ).chl.TNScoeffs ...
-        );
+            % Per Channel
+            AACSeq1( frame_i ).(['ch' channel]).frameF = iTNS( ...
+                AACSeq2( frame_i ).(['ch' channel]).frameF, ...
+                AACSeq2( frame_i ).frameType, ...
+                AACSeq2( frame_i ).(['ch' channel]).TNScoeffs ...
+            );
 
-        % Right Channel
-        AACSeq1( frame_i ).chr.frameF = iTNS( ...
-            AACSeq2( frame_i ).chr.frameF, ...
-            AACSeq2( frame_i ).frameType, ...
-            AACSeq2( frame_i ).chr.TNScoeffs ...
-        );
-
+        end
+    
     end
     
     %% Inverse Level-1 Decoder

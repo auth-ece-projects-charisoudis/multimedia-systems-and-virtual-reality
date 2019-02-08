@@ -88,7 +88,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     G = a( 1 );
     sfc = [ G; diff( a ) ];
 
-    % Experiment: Set all sfcs equal to zero
+    %% Experiment: Set all sfcs equal to zero
 %     G = 0;
 %     sfc = zeros( size( sfc ) );
 

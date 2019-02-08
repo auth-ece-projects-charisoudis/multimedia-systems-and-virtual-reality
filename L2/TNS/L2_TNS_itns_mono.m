@@ -6,9 +6,9 @@ function frameFout = L2_TNS_itns_mono( frameFin, TNScoeffs )
 %   
 %   frameFout: reconstructed MDCT coefficients
 %
-    
-%     frameFout = frameFin;
-%     return
+% 
+%   frameFout = frameFin;
+% 
 
     %% Un-Filter produced MDCT Coeffs to reconstruct original
     % Set numerator denominator coefs

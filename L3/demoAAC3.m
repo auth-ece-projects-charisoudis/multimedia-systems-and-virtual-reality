@@ -3,8 +3,12 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
 %   
 %   fNameIn: input wav's filename
 %   fNameOut: output wav's filename
+%   confset: execution configuration parameters as one of the pre-defined
+%   configuration sets ( see ConfSets class )
 %   
 %   SNR: codec's SNR
+%   bitrate: codec's resulting datarate
+%   compression: resulting datarate / original datarate
 %
 
     % Set confset if none selected

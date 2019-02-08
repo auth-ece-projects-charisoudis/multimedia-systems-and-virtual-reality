@@ -32,7 +32,7 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
 
     end
     
-    %% Process Normalization Coefficients
+    %% Smooth Normalization Coefficients
     % Back-Smoothing
     for k = NCOEFFS-1:-1:1
        
@@ -51,12 +51,12 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     Xw = frameFin ./ Sw;
     
     %% Linear Predictor Coefficients
-%     % Compute directly via lpc
-%     A = lpc( Xw, 4 );
-    % Calculate auto-correlation matrix
-    r = xcorr( Xw );
-    % Solve normal equations
-    A = levinson( r( length( frameFin ) : end ), 4 );
+    % Compute directly via lpc
+    A = lpc( Xw, 4 );
+%     % Calculate auto-correlation matrix
+%     r = xcorr( Xw );
+%     % Solve normal equations
+%     A = levinson( r( length( frameFin ) : end ), 4 );
     
     % Quantize
     TNScoeffs = L2_TNS_QUANTIZER_uniform_midrise( A( 2 : end ), 4, 0.1 );

@@ -1,11 +1,20 @@
-function AACSeq2 = AACoder2( fNameIn )
+function AACSeq2 = AACoder2( fNameIn, confset )
 %AACODER2 Level-2 AAC Enoder
 %   
 %   fNameIn: wav file's name ( on which the AAC Coder will be executed )
+%   confset: execution configuration parameters as one of the pre-defined
+%   configuration sets ( see ConfSets class )
 % 
 %   AACSeq2: Level-2 output struct containing info for each of the coder's
 %   frames
 % 
+
+    % Configuration Set
+    if ( nargin == 1 )
+        
+       confset = ConfSets.Default;
+        
+    end
 
     %% Check for tables' presence in global workspace
     global B219a
@@ -20,7 +29,7 @@ function AACSeq2 = AACoder2( fNameIn )
     end
     
     %% Level-1 Encoder
-    AACSeq1 = AACoder1( fNameIn );
+    AACSeq1 = AACoder1( fNameIn, confset );
     
     %% Level-2 Encoder
     % Get number of frames
@@ -30,20 +39,18 @@ function AACSeq2 = AACoder2( fNameIn )
     AACSeq2 = AACSeq1;
 
     % Apply TNS
-    for frame_i = 1 : NFRAMES
+    for channel = 'lr'
         
-        % Left Channel
-        [AACSeq2( frame_i ).chl.frameF, AACSeq2( frame_i ).chl.TNScoeffs] = TNS( ...
-            AACSeq2( frame_i ).chl.frameF, ...
-            AACSeq2( frame_i ).frameType ...
-        );
+        for frame_i = 1 : NFRAMES
 
-        % Right Channel
-        [AACSeq2( frame_i ).chr.frameF, AACSeq2( frame_i ).chr.TNScoeffs] = TNS( ...
-            AACSeq2( frame_i ).chr.frameF, ...
-            AACSeq2( frame_i ).frameType ...
-        );
+            % Per Channel
+            [AACSeq2( frame_i ).(['ch' channel]).frameF, AACSeq2( frame_i ).(['ch' channel]).TNScoeffs] = TNS( ...
+                AACSeq2( frame_i ).(['ch' channel]).frameF, ...
+                AACSeq2( frame_i ).frameType ...
+            );
 
+        end
+    
     end
     
 end

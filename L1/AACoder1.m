@@ -1,11 +1,20 @@
-function AACSeq1 = AACoder1( fNameIn )
+function AACSeq1 = AACoder1( fNameIn, confset )
 %AACCODER1 Level-1 AAC Coder
 %   
 %   fNameIn: wav file's name ( on which the AAC Coder will be executed )
+%   confset: execution configuration parameters as one of the pre-defined
+%   configuration sets ( see ConfSets class )
 % 
 %   AACSeq1: Level-1 output struct containing info for each of the coder's
 %   frames
 % 
+
+    % Configuration Set
+    if ( nargin == 1 )
+        
+       confset = ConfSets.Default;
+        
+    end
 
     %% Constants
     WINDOW_LENGTH = 2048;
@@ -20,7 +29,7 @@ function AACSeq1 = AACoder1( fNameIn )
     
     %% Global Config
     global AACONFIG
-    register_config( ConfSets.Marios )
+    register_config( confset )
 
     %% Read wav file
     [y, ~] = audioread( fNameIn );
