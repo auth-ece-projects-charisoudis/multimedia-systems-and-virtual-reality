@@ -50,15 +50,28 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     % Trim output back to original number of samples
     y_out = y_out( 1 : NSAMPLES, : );
     
+    %% Finished
+    toc
+    
     % Write Codec's output to file
-    if( nargout == 0 || true )
+    if( nargout == 0 )
        
+        % if file exists, tweak fNameOut by adding a Level_3 indicator
+        if isfile( fNameOut )
+           
+            % Change filename
+            [~, fName, fExt] = fileparts( fNameOut );
+            fName = [fName '_L3'];
+            
+            % Re-compose fNameOut
+            fNameOut = [fName fExt];
+            
+        end
+        
+        % Write file
         audiowrite( fNameOut, y_out, FS );
         
     end
-    
-    %% Finished
-    toc
 
     %% Compute SNR
     snrOb = L1_AACODER_SnrCalculator( y, audioread( fNameOut ) );

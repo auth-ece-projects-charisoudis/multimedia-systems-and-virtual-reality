@@ -34,6 +34,26 @@ function SNR = demoAAC2( fNameIn, fNameOut, confset )
     
     %% Finished
     toc
+    
+    % Write Codec's output to file
+    if( nargout == 0 )
+       
+        % if file exists, tweak fNameOut by adding a Level_3 indicator
+        if isfile( fNameOut )
+           
+            % Change filename
+            [~, fName, fExt] = fileparts( fNameOut );
+            fName = [fName '_L2'];
+            
+            % Re-compose fNameOut
+            fNameOut = [fName fExt];
+            
+        end
+        
+        % Write file
+        audiowrite( fNameOut, y_out, FS );
+        
+    end
 
     % Print SNR
     [ SNR, ~, ~ ] = L1_AACODER_snr( y, y_out );
