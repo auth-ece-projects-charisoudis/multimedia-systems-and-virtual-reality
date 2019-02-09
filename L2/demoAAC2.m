@@ -17,12 +17,12 @@ function SNR = demoAAC2( fNameIn, fNameOut, confset )
     end
 
     %% Get y for SNR calculation
-    [ y, ~ ] = audioread( fNameIn );
+    [ y, Fs ] = audioread( fNameIn );
     y = [ y; zeros( 1024 - rem( size( y, 1 ), 1024 ), 2 ) ];
 
     %% Start!
     clear global
-    clearvars -except fNameIn fNameOut y confset;
+    clearvars -except fNameIn fNameOut y Fs confset;
     clc
     tic
     
@@ -51,7 +51,7 @@ function SNR = demoAAC2( fNameIn, fNameOut, confset )
         end
         
         % Write file
-        audiowrite( fNameOut, y_out, FS );
+        audiowrite( fNameOut, y_out, Fs );
         
     end
 
