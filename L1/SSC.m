@@ -1,4 +1,4 @@
-function frameType = SSC( frameT, nextFrameT, prevFrameType )
+function frameType = SSC( ~, nextFrameT, prevFrameType )
 %SSC Sequence Segmentatio Control
 %   Finds the frame type for each frame in the frame sequence
 % 
@@ -15,7 +15,7 @@ function frameType = SSC( frameT, nextFrameT, prevFrameType )
     end
 
     %% FIX: permute input frames ( 2048x1x2 --> 2048x2 )
-    frameT = permute( frameT, [1, 3, 2] );
+%     frameT = permute( frameT, [1, 3, 2] );
     nextFrameT = permute( nextFrameT, [1, 3, 2] );
     
     %% Trivial Cases

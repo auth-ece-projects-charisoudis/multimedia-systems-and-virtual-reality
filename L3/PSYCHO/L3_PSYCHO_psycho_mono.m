@@ -2,7 +2,8 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
 %L3_PSYCHO_PSYCHO_MONO Applies psychoaccoustic model to a signle frame or
 %subframe with pre-processed previous frames.
 % 
-%   frames: the 3 consecutive frames [ current, previous, pre-previous ]
+%   frames: the 3 consecutive frames [ current, previous, pre-previous ] in
+%   time-domain
 %   spreading_matrix: spreading function NbxNb matrix between all bands for
 %   this type of frame
 %   hann_window: the hanning window to apply to frame before processing
@@ -22,9 +23,12 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     %% FFT for each frame
     frames_fft = fft( frames_windowed, FRAME_LENGTH, 1 );
     
+    % From now on, deal with only half of the fft samples
+    FRAME_LENGTH = FRAME_LENGTH * 0.5;
+    
     % Extract norm and angle ( for ( half + 1 ) fft coefficients )
-    r = abs( frames_fft( 1 : FRAME_LENGTH / 2, : ) );
-    f = angle( frames_fft( 1 : FRAME_LENGTH / 2, : ) );
+    r = abs( frames_fft( 1 : FRAME_LENGTH, : ) );
+    f = angle( frames_fft( 1 : FRAME_LENGTH, : ) );
     
     %% Compute prediction
     rpred = 2 * r( :, 2 ) - r( :, 3 );
@@ -41,7 +45,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
         c = [ sqrt( ...
             ( r( 1:6 ) .* cos( f( 1:6 ) ) - rpred( 1:6 ) .* cos( fpred( 1:6 ) ) ) .^ 2 + ...
             ( r( 1:6 ) .* sin( f( 1:6 ) ) - rpred( 1:6 ) .* sin( fpred( 1:6 ) ) ) .^ 2 ...
-        ) ./ ( r( 1:6 ) + abs( rpred( 1:6 ) ) ); 0.4 * ones( FRAME_LENGTH / 2 - 6, 1 ) ];
+        ) ./ ( r( 1:6 ) + abs( rpred( 1:6 ) ) ); 0.4 * ones( FRAME_LENGTH - 6, 1 ) ];
         
     else
         
@@ -81,9 +85,12 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % ) for all b
     tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
     
-    % Clip indeces ( tonality index should be in range [0,1] )    
+    % Clip indeces ( tonality index should be in range [0,1] )
     tb( tb > 1 ) = 1;
     tb( tb < 0 ) = 0;
+    
+    assert( all( tb <= 1 ) );
+    assert( all( tb >= 0 ) );
     
     %% SNR
     % TMN( b ) = 18dB constant for all bands
@@ -102,7 +109,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % std_table' bands
     
     % Noise Level
-    qthr_hat = ( eps() * 0.5 * FRAME_LENGTH ) * ( 10 .^ ( 0.1 * std_table( :, 6 ) ) );
+    qthr_hat = ( eps() * FRAME_LENGTH ) * ( 10 .^ ( 0.1 * std_table( :, 6 ) ) );
     npart = max( nb, qthr_hat );
     
     %% Compute SMR

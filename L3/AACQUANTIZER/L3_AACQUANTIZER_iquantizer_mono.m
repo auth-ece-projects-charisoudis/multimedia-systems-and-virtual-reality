@@ -1,4 +1,4 @@
-function frame = L3_AACQUANTIZER_iquantizer_mono( S, sfc, std_table )
+function frameF = L3_AACQUANTIZER_iquantizer_mono( S, sfc, std_table )
 %L3_AACQUANTIZER_IQUANTIZER_MONO De-Quantizes a single frame or sub-frame
 %
 %   S: quantized MDCT coefficients
@@ -10,7 +10,7 @@ function frame = L3_AACQUANTIZER_iquantizer_mono( S, sfc, std_table )
     
     %% Constants
     NBANDS = length( sfc );
-    frame = zeros( length( S ), 1 );
+    frameF = zeros( length( S ), 1 );
     
     %% Reconstruct Scalefactors using Inverse DPCM
     a = cumsum( sfc );
@@ -23,10 +23,9 @@ function frame = L3_AACQUANTIZER_iquantizer_mono( S, sfc, std_table )
         whigh = std_table( b, 3 ) + 1;
     
         % Apply Q^(-1) Formula
-        frame( wlow : whigh ) = ...
-            L2_TNS_QUANTIZER_sgn( S( wlow : whigh ) ) .* ( abs( S( wlow : whigh ) ) .^ (4 / 3) ) ...
-            * 2^( 0.25 * a( b ) ) ...
-        ;
+        frameF( wlow : whigh ) = L2_TNS_QUANTIZER_sgn( S( wlow : whigh ) ) .* ( ...
+            abs( S( wlow : whigh ) ) .^ (4 / 3) * 2^( 0.25 * a( b ) ) ...
+        );
 
     end
 end

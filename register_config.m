@@ -51,7 +51,7 @@ function register_config( confset )
                 'HUFFMAN_ENCODE', false, ...
                 'HUFFMAN_ENCODE_SFCS', true, ...
                 'HUFFMAN_ENCODE_SFCS_COMBINED', false, ...
-                'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.SameAsFirst ...
+                'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.FromPreviousFrame ...
             ) ...
         );
     
@@ -73,12 +73,12 @@ function register_config( confset )
             case ConfSets.Marios
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.FromPreviousFrame;
 
             case ConfSets.Marios_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
+                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.FromPreviousFrame;
 
         end
         

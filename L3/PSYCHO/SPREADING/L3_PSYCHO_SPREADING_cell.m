@@ -11,7 +11,7 @@ function x = L3_PSYCHO_SPREADING_cell( bi, bj )
     
     %% tmpx
     tmpx = 1.5 * ( bj - bi );
-    if ( bi >= bj )
+    if ( bj >= bi )
        
         tmpx = 2 * tmpx;
         

@@ -19,31 +19,31 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     %% Calculate Normalization Coefficients
     P = zeros( NBANDS, 1 );
     Sw = zeros( NCOEFFS, 1 );
-    for j = 1:NBANDS
+    for b = 1 : NBANDS
 
-        klow = std_table( j, 2 ) + 1;
-        khigh = std_table( j, 3 ) + 1;
+        klow = std_table( b, 2 ) + 1;
+        khigh = std_table( b, 3 ) + 1;
 
         % Band Energy
-        P( j ) = sumsqr( frameFin( klow : khigh ) );
+        P( b ) = sumsqr( frameFin( klow : khigh ) );
 
         % Normalizing Coefficients for this Band
-        Sw( klow : khigh ) = 1 / sqrt( P ( j ) );
+        Sw( klow : khigh ) = 1 / sqrt( P ( b ) );
 
     end
     
     %% Smooth Normalization Coefficients
     % Back-Smoothing
-    for k = NCOEFFS-1:-1:1
+    for k = NCOEFFS-1 : -1 : 1
        
-        Sw( k ) = ( Sw( k ) + Sw( k + 1 ) ) / 2;
+        Sw( k ) = 0.5 * ( Sw( k ) + Sw( k + 1 ) );
         
     end
     
     % Forward-Smoothing
-    for k = 2:NCOEFFS
+    for k = 2 : NCOEFFS
        
-        Sw( k ) = ( Sw( k ) + Sw( k - 1 ) ) / 2;
+        Sw( k ) = 0.5 * ( Sw( k ) + Sw( k - 1 ) );
         
     end
     
