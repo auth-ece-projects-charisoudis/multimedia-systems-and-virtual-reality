@@ -39,7 +39,7 @@ function output = L2_TNS_QUANTIZER_uniform_midrise( input, R, Delta )
         % Check if outsite of range
         if ( number_abs >= xmax )
 
-            output = number_sign * ( 0.5 + ( N - 1 ) ) * Delta;
+            output = number_sign * ( 0.5 + ( N  ) * Delta;
 
         end
 
