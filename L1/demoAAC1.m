@@ -34,6 +34,13 @@ function SNR = demoAAC1( fNameIn, fNameOut, confset )
     
     %% Finished
     toc
+    
+    % Write output file
+    if ( nargout == 0 )
+        
+        audiowrite( fNameOut, y_out, 48000 )
+        
+    end
 
     % Print SNR
     [ SNR, ~, ~ ] = L1_AACODER_snr( y, y_out );

@@ -52,16 +52,12 @@ function AACSeq1 = AACoder1( fNameIn, confset )
     % be used in the psychoacoustic modeling stage of the encoder.
     if ( AACONFIG.L1.L3_ENCODER_RUNNING )
         
-        for channel = 'lr'
-        
-            for frame_i = 1 : NFRAMES
-
-                % Per Channel
-                AACSeq1( frame_i ).(['ch' channel]).frameT = ...
-                    channel_frames_by_channel( :, frame_i, strfind( 'lr', channel ) );
-
-            end
-        
+        for frame_i = 1:NFRAMES
+           
+            % Per Channel
+            AACSeq1( frame_i ).(['ch' channel]).frameT = ...
+                channel_frames_by_channel( :, frame_i, 1 );
+            
         end
         
     end
@@ -82,13 +78,9 @@ function AACSeq1 = AACoder1( fNameIn, confset )
     % last frame - only left half has non-zero values - is set based on
     % previous frame's type
     if (  AACSeq1( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-        
         AACSeq1( NFRAMES ).frameType = L1_SSC_Frametypes.LongStop;
-        
     else
-        
         AACSeq1( NFRAMES ).frameType = L1_SSC_Frametypes.OnlyLong;
-        
     end
 
     %% FilterBank: Time-to-Frequency Mapping for each frame using MDCT

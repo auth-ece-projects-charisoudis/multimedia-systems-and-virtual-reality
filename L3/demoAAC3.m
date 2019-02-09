@@ -61,7 +61,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     toc
 
     %% Compute SNR
-    snrOb = L1_AACODER_SnrCalculator( y, y_out );
+    snrOb = L1_AACODER_SnrCalculator( y, audioread( fNameOut ) );
     SNR = snrOb.mean;
     
     %% Compute bitrate

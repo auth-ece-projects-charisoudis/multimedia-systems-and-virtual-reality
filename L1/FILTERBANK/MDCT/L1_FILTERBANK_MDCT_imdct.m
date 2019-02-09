@@ -16,39 +16,36 @@ function xn = L1_FILTERBANK_MDCT_imdct( Xk )
 % ----------------------------------------------------------
 %
 
-%% Check if Marios Athineos's method selected
-global AACONFIG
-if ( ~isempty( AACONFIG ) && strcmp( AACONFIG.L1.MDCT_METHOD, 'marios' ) )
-   
-    xn = imdct4( Xk );
-    return
-    
-end
+    %% Check if Marios Athineos's method selected
+    global AACONFIG
+    if ( ~isempty( AACONFIG ) && strcmp( AACONFIG.L1.MDCT_METHOD, 'marios' ) )
 
-%% Constants
-K = size( Xk, 1);
-N = K * 2;
-n0 = ( N/2 + 1 ) / 2;
-n = 0 : N -1;       % time samples' index
-% k = 0 : K -1;       % frequency samples' index
+        xn = imdct4( Xk );
+        return
 
-n = n';
+    end
 
-% Complex Exponentials
-c1 = exp( ( ( 1i * 2*pi * n0 ) / N ) * n );
-c2 = exp( ( ( 1i * pi ) / N ) * ( n + n0 ) );
+    %% Constants
+    K = length( Xk );
+    N = K * 2;
+    n0 = 0.5 * ( 0.5 * N + 1 );
+    n = ( 0 : N - 1 )';      % time samples' index
 
-%% Pre-twiddle ( multiplication with complex term )
-Xk_extended = [ Xk; -flipud( Xk ) ];
-Xk_pre_twjddled = c1 .* Xk_extended;
+    % Complex Exponentials
+    c1 = exp( ( ( 1i * 2*pi * n0 ) / N ) * n );
+    c2 = exp( ( ( 1i * pi ) / N ) * ( n + n0 ) );
 
-%% N-point Inverse FFT
-xn_untwiddled = ifft( Xk_pre_twjddled );
+    %% Pre-twiddle ( multiplication with complex term )
+    Xk_extended = [ Xk; -flipud( Xk ) ];
+    Xk_pre_twiddled = c1 .* Xk_extended;
 
-%% Post-twiddle
-xn_post_twiddled = c2 .* xn_untwiddled;
+    %% N-point Inverse FFT
+    xn_ifft = ifft( Xk_pre_twiddled );
 
-%% Real
-xn = 2 * real( xn_post_twiddled );
+    %% Post-twiddle
+    xn_post_twiddled = xn_ifft .* c2;
+
+    %% Real
+    xn = 2 * real( xn_post_twiddled );
 
 end

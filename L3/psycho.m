@@ -68,7 +68,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         if ( isempty( hann_window_short ) )
            
-            hann_window_short = hann( 2 * FRAME_LENGTH / 8 );
+            hann_window_short = hann( FRAME_LENGTH / 8 );
             hann_window_short = hann_window_short( 1 : FRAME_LENGTH / 8 );
             
         end
@@ -78,7 +78,7 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         
         if ( isempty( hann_window_long ) )
            
-            hann_window_long = hann( 2 * FRAME_LENGTH );
+            hann_window_long = hann( FRAME_LENGTH );
             hann_window_long = hann_window_long( 1 : FRAME_LENGTH );
             
         end
