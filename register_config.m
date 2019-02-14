@@ -35,6 +35,7 @@ function register_config( confset )
         AACONFIG = struct( ...
             'DEBUG', false, ...
             'L1', struct( ...
+                'WINDOW_SHAPE', 'KBD', ...
                 'MDCT_METHOD', 'default', ...           % default or marios
                 'SSC_FIRST_FRAME_TYPE', L1_SSC_Frametypes.OnlyLong, ...
                 'SSC_ONLY_LONG_TEST', false, ...
@@ -51,7 +52,7 @@ function register_config( confset )
                 'HUFFMAN_ENCODE', false, ...
                 'HUFFMAN_ENCODE_SFCS', true, ...
                 'HUFFMAN_ENCODE_SFCS_COMBINED', false, ...
-                'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.FromPreviousFrame ...
+                'ON_PREV_MISSING_POLICY', L3_PSYCHO_MissingPolicies.Zeros ...
             ) ...
         );
     
@@ -60,25 +61,19 @@ function register_config( confset )
 
             case ConfSets.Default
                 AACONFIG.L1.MDCT_METHOD = 'default';
-                AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
 
             case ConfSets.Default_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'default';
-                AACONFIG.L1.SNR.COMPUTE_METHOD = 'default';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.Zeros;
 
             case ConfSets.Marios
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = false;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.FromPreviousFrame;
 
             case ConfSets.Marios_Huffman
                 AACONFIG.L1.MDCT_METHOD = 'marios';
                 AACONFIG.L3.HUFFMAN_ENCODE = true;
-                AACONFIG.L3.ON_PREV_MISSING_POLICY = L3_PSYCHO_MissingPolicies.FromPreviousFrame;
 
         end
         

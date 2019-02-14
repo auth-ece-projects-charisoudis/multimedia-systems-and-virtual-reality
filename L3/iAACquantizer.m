@@ -1,4 +1,4 @@
-function frameF = iAACquantizer( S, sfc, ~, frameType )
+function frameF = iAACquantizer( S, sfc, G, frameType )
 %IAACQUANTIZER De-Quantizer Stage for Level-3 AAC Decoder.
 %
 %   S: quantized MDCT coefficients
@@ -33,7 +33,8 @@ function frameF = iAACquantizer( S, sfc, ~, frameType )
             
             frameF( :, subframe_i ) = L3_AACQUANTIZER_iquantizer_mono( ...
                 S( :, subframe_i ), ...
-                sfc( subframe_i ), ...
+                sfc( :, subframe_i ), ...
+                G(subframe_i), ...
                 B219b ...
             );
             
@@ -41,9 +42,8 @@ function frameF = iAACquantizer( S, sfc, ~, frameType )
         
     else
         
-        frameF = L3_AACQUANTIZER_iquantizer_mono( S, sfc, B219a );
+        frameF = L3_AACQUANTIZER_iquantizer_mono( S, sfc, G, B219a );
         
     end
 
 end
-

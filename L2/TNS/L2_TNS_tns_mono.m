@@ -53,23 +53,61 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     %% Linear Predictor Coefficients
     % Compute directly via lpc
     A = lpc( Xw, 4 );
-%     % Calculate auto-correlation matrix
-%     r = xcorr( Xw );
-%     % Solve normal equations
-%     A = levinson( r( length( frameFin ) : end ), 4 );
+    A = -A( 2 : end );
     
     % Quantize
-    TNScoeffs = L2_TNS_QUANTIZER_uniform_midrise( A( 2 : end ), 4, 0.1 );
+    TNScoeffs = L2_TNS_QUANTIZER_quantizer_uniform_midrise( A, 4, 0.1 );
+    TNSceffs_hat = L2_TNS_QUANTIZER_dequantizer_uniform_midrise( TNScoeffs, 4, 0.1 );
     
     %% Filter Initial MDCT Coeffs
     % Set numerator denominator coefs
-    num = [1; TNScoeffs];
+    num = [1; -TNSceffs_hat];
     denom = 1;
     
-    % Check if INVERSE filter is stable
+    % Check if INVERSE filter is stable 
+    if ( ~isstable( denom, num ) )
+        
+        num_roots = roots( num );
+        in = find( abs( num_roots ) > 0.98 );
+        
+        num_roots( in ) = num_roots( in ) ./ ( abs( num_roots( in ) ) + 0.15 );
+        num = poly( num_roots );
+        
+    end
+    
     assert( isstable( denom, num ) )
     
     % Perform the actual filtering
     frameFout = filter( num, denom, frameFin );
     
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

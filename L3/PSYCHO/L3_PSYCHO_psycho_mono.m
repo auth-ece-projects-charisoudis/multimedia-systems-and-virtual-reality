@@ -21,10 +21,10 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     frames_windowed = frames .* repmat( hann_window, [1 3] );
 
     %% FFT for each frame
-    frames_fft = fft( frames_windowed, FRAME_LENGTH, 1 );
+    frames_fft = fft( frames_windowed );
     
     % From now on, deal with only half of the fft samples
-    FRAME_LENGTH = FRAME_LENGTH * 0.5;
+    FRAME_LENGTH = FRAME_LENGTH * 0.5 + 1;
     
     % Extract norm and angle ( for ( half + 1 ) fft coefficients )
     r = abs( frames_fft( 1 : FRAME_LENGTH, : ) );
@@ -59,6 +59,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     %% Band Energy & Weighted Predictability Measure
     e = zeros( NBANDS, 1 );
     cw = zeros( NBANDS, 1 );
+    
     for b = 1 : NBANDS
         
         wlow = std_table( b, 2 ) + 1;
@@ -71,7 +72,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     
     %% Combine Energy & Predictability with Spreading Function
     spreading_matrix_transpose = spreading_matrix';
-    spreading_matrix_colsum( :, 1 ) = sum( spreading_matrix );
+    spreading_matrix_colsum( :, 1 ) = sum( spreading_matrix, 1 );
     
     ecb = spreading_matrix_transpose * e;
     ct = spreading_matrix_transpose * cw;

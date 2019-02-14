@@ -1,4 +1,4 @@
-function output = L2_TNS_QUANTIZER_uniform_midrise( input, R, Delta )
+function symbol = L2_TNS_QUANTIZER_quantizer_uniform_midrise( input, R, Delta )
 %L2_TNS_QUANTIZER_UNIFORM_MIDRISE Uniform midrise quantizer with R bits and
 % Delta  bin range.
 % 
@@ -6,18 +6,19 @@ function output = L2_TNS_QUANTIZER_uniform_midrise( input, R, Delta )
 %   R: quantizer bits ( bits / sample )
 %   Delta : bin width ( range )
 % 
-%   output: number quantized with R bits
+%   symbol: quantizer's output is a symbol, denoting the bin the input 
+%   belongs to
 %
 
     %% Vector Input
     NINPUTS = length( input );
     if ( NINPUTS > 1 )
        
-        output = zeros( NINPUTS, 1 );
+%         symbol = char( NINPUTS, 1 );
         
         for input_i = 1 : NINPUTS
            
-            output( input_i ) = L2_TNS_QUANTIZER_uniform_midrise( ...
+            symbol( input_i, : ) = L2_TNS_QUANTIZER_quantizer_uniform_midrise( ...
                 input( input_i ), R,  Delta ...
             );
             
@@ -39,7 +40,7 @@ function output = L2_TNS_QUANTIZER_uniform_midrise( input, R, Delta )
         % Check if outsite of range
         if ( number_abs >= xmax )
 
-            output = number_sign * ( 0.5 + ( N - 1 ) ) * Delta;
+            symbol = number_sign * ( N - 1 ) + number_sign;
 
         end
 
@@ -47,15 +48,53 @@ function output = L2_TNS_QUANTIZER_uniform_midrise( input, R, Delta )
         for bin = 0 : N - 1
 
             if ( bin * Delta <= number_abs && number_abs < ( bin + 1 ) * Delta )
-
-                output = number_sign * ( 0.5 + bin ) * Delta;
+                
+                symbol = number_sign * bin + number_sign;
                 break
 
             end
 
         end
+        
+        % Convert to binary string
+        symbol = L2_TNS_QUANTIZER_dec2bin( symbol, 4 );
     
     end
     
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

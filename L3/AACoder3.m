@@ -48,12 +48,12 @@ function AACSeq3 = AACoder3( fNameIn, confset )
     %% Quantize MDCT Coefficients based on Psychoaccoustics
     % Get number of frames
     NFRAMES = size( AACSeq2, 1 );
-    FRAME_LENGTH = length( AACSeq2( 1 ).chl.frameF );
+    FRAME_LENGTH = 2 * length( AACSeq2( 1 ).chl.frameF );
     
     % Initialize output struct
     AACSeq3 = AACSeq2;
     
-    % Psychoaccoustic Model    
+    % Psychoaccoustic Model
     for channel = 'lr'
         
         %  - initialize    
@@ -78,11 +78,17 @@ function AACSeq3 = AACoder3( fNameIn, confset )
             frame_indices_sequence = 1 : NFRAMES;
 
         end
+        
+        % ESH
+        clearvars -global ESH_frameTprev1 ESH_frameTprev2
+        
+        frameTprev1S_C = zeros( 256, 1);
+        frameTprev2S_C = zeros( 256, 1);
 
         %  - run
         deferred_execution = false;
         for frame_i = frame_indices_sequence
-        
+
             if ( AACONFIG.DEBUG )
 
                 sprintf( ...
@@ -100,16 +106,48 @@ function AACSeq3 = AACoder3( fNameIn, confset )
             %   - compute SMR
             if ( ~deferred_execution )
 
-                SMR_L = psycho( ...
+                SMR_C = psycho( ...
                     frameT_C, ...
                     AACSeq3( frame_i ).frameType, ...
                     frameTprev1_C, frameTprev2_C ...
                 );
+            
+                %   - slide Frames
+                if ( AACSeq3( frame_i ).frameType ~= L1_SSC_Frametypes.EightShort)
 
+                    frameTprev2_C = frameTprev1_C;
+                    frameTprev1_C = frameT_C;
+
+                end
+% 
+%                 if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
+%                     
+%                     SMR_C = psycho( ...
+%                         frameT_C, ...
+%                         AACSeq3( frame_i ).frameType, ...
+%                         frameTprev1S_C, frameTprev2S_C ...
+%                     );
+%                 
+%                     frameTprev1S_C = frameT_C(1345:1600,:);
+%                     frameTprev2S_C = frameT_C(1217:1472,:);
+%                     
+%                 else
+%                    
+%                     SMR_C = psycho( ...
+%                         frameT_C, ...
+%                         AACSeq3( frame_i ).frameType, ...
+%                         frameTprev1_C, frameTprev2_C ...
+%                     );
+%                 
+%                     frameTprev2_C = frameTprev1_C;
+%                     frameTprev1_C = frameT_C;
+%                     
+%                 end
+                    
             else
 
-                % SMR_L retains its last value, thus 3rd frame's SMR ( for left
-                % channel )
+                % SMR_L retains its last value, thus 3rd frame's SMR ( for 
+                % left channel )
 
             end
 
@@ -117,7 +155,7 @@ function AACSeq3 = AACoder3( fNameIn, confset )
             [ S, sfc, AACSeq3( frame_i ).(['ch' channel]).G ] = AACquantizer( ...
                 AACSeq3( frame_i ).(['ch' channel]).frameF, ...
                 AACSeq3( frame_i ).frameType, ...
-                SMR_L ...
+                SMR_C ...
             );
 
             %   - Huffman encode
@@ -131,17 +169,7 @@ function AACSeq3 = AACoder3( fNameIn, confset )
                 if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
 
                     if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-                        
-                        % Round first sfc for each subframe
-                        for subframe_i = 1 : 8
-
-                            % Cast sfc to unsigned 8bit integer
-                            sfc( 1, subframe_i ) = cast( ...
-                                floor( sfc( 1, subframe_i ) ), 'uint8' ...
-                            );
-                            
-                        end
-                        
+                                                
                         % Huffman encode
                         if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS_COMBINED )
 
@@ -163,9 +191,6 @@ function AACSeq3 = AACoder3( fNameIn, confset )
                         end
 
                     else
-
-                        % Cast sfc to unsigned 8bit integer
-                        sfc( 1 ) = cast( floor( sfc( 1 ) ), 'uint8' );
                         
                         % Get huffman bit-sequence
                         AACSeq3( frame_i ).(['ch' channel]).sfc = ...
@@ -183,14 +208,6 @@ function AACSeq3 = AACoder3( fNameIn, confset )
 
                 AACSeq3( frame_i ).(['ch' channel]).stream = S;
                 AACSeq3( frame_i ).(['ch' channel]).sfc = sfc;
-
-            end
-
-            %   - slide Frames
-            if ( ~deferred_execution )
-
-                frameTprev2_C = frameTprev1_C;
-                frameTprev1_C = frameT_C;
 
             end
 

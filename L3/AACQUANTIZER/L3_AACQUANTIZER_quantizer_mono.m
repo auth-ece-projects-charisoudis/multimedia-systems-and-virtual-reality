@@ -8,7 +8,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
 %   S: quantized frame MDCT coefficients
 %   sfc: scalefactors ( Nb x 1 )
 %   G: global gain ( sfc( 0 ) )
-% 
+%
     
     %% Constants
     FRAME_LENGTH = length( frame );
@@ -49,7 +49,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         whigh = std_table( b, 3 ) + 1;
         
         Pe = T( b );
-        while ( Pe <= T( b ) && max( abs( diff( a ) ) ) <= 60 )
+        while ( Pe <= T( b ) && max( abs( diff( a ) ) ) <= 59 )
             
             % Increment sfc ( lowers quantizer's quality in this band )
             a( b ) = a( b ) + 1;
@@ -87,7 +87,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     
     %% Scalefactors
     G = a( 1 );
-    sfc = [ G; diff( a ) ];
+    sfc = diff( a );
 
     %% Experiment: Set all sfcs equal to zero
 %     G = 0;

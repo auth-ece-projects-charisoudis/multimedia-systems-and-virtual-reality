@@ -35,16 +35,16 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     y_out = iAACoder3( AACSeq3, fNameOut );
     
     %% Check result
-%     S = load( 'level3.mat', 'y' );
-%     y_del = S.y( 1:end - 1024, : );    % y_del has 1024 more samples/channel than y_out
-%     
-%     figure
-%     plot( abs( y_out( :, 1 ) - y_del( :, 1 ) ) )
-%     title( ['max = ' num2str( max( abs( y_out( :, 1 ) - y_del( :, 1 ) ) ) ) ] )
-%     
-%     figure
-%     plot( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) )
-%     title( ['max = ' num2str( max( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) ) ) ] )
+    S = load( 'level3.mat', 'y' );
+    y_del = S.y( 1:end - 1024, : );    % y_del has 1024 more samples/channel than y_out
+    
+    figure
+    plot( abs( y_out( :, 1 ) - y_del( :, 1 ) ) )
+    title( ['max = ' num2str( max( abs( y_out( :, 1 ) - y_del( :, 1 ) ) ) ) ] )
+    
+    figure
+    plot( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) )
+    title( ['max = ' num2str( max( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) ) ) ] )
     
     
     % Trim output back to original number of samples

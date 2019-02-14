@@ -58,14 +58,14 @@ function x = iAACoder3( AACSeq3, fNameOut )
 
                     if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
                         
-                        sfc = zeros( 42, 8 );
+                        sfc = zeros( 41, 8 );
                         if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS_COMBINED )
 
                             % Split decoded sfcs
                             sfc = buffer( decodeHuff( ...
                                 AACSeq3( frame_i ).(['ch' channel]).sfc, ...
                                 12, HUFFMAN_LUT ...
-                            ), 42 );
+                            ), 41 );
                             
                         else
 
@@ -81,24 +81,13 @@ function x = iAACoder3( AACSeq3, fNameOut )
                             end
                         
                         end
-                        
-                        % Restore G
-                        for subframe_i = 1 : 8
-                            
-                            sfc( 1, subframe_i ) = ...
-                                AACSeq3( frame_i ).(['ch' channel]).G( subframe_i );
-
-                        end
 
                     else
 
-                        sfc = decodeHuff( ...
+                        sfc = reshape( decodeHuff( ...
                             AACSeq3( frame_i ).(['ch' channel]).sfc, ...
                             12, HUFFMAN_LUT ...
-                        );
-                        
-                        % Restore G
-                        sfc( 1 ) = AACSeq3( frame_i ).(['ch' channel]).G;
+                        ), [ 68, 1 ] );
 
                     end
 
