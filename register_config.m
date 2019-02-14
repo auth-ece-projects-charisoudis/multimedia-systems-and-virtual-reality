@@ -13,6 +13,7 @@ function register_config( confset )
 
     global AACONFIG AACONFSET
 
+    
     % Configuration set
     if ( nargin == 0 || isempty( confset ) )
 
