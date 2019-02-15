@@ -86,7 +86,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     % Reconstructed
     %   - 48000 samples / sec
     %   - x bits / sample
-    total_bits = L3_AACODER_sec2bits( AACSeq3 );
+    total_bits = L3_AACODER_sec2bits( AACSeq3, fnameAACoded );
     bitrate = total_bits / secs;
     
     %% Compute compression

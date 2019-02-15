@@ -21,13 +21,12 @@ function CompressedSeq = L3_AACODER_compress_sec( AACSeq3 )
             CompressedSeq( frame_i ).(['ch' channel]).stream    = AACSeq3( frame_i ).(['ch' channel]).stream;
             CompressedSeq( frame_i ).(['ch' channel]).codebook  = AACSeq3( frame_i ).(['ch' channel]).codebook;
             CompressedSeq( frame_i ).(['ch' channel]).sfc       = AACSeq3( frame_i ).(['ch' channel]).sfc;
-            CompressedSeq( frame_i ).(['ch' channel]).G         = AACSeq3( frame_i ).(['ch' channel]).G;
+            CompressedSeq( frame_i ).(['ch' channel]).G         = uint8(round( AACSeq3( frame_i ).(['ch' channel]).G ) );
             CompressedSeq( frame_i ).(['ch' channel]).TNScoeffs = AACSeq3( frame_i ).(['ch' channel]).TNScoeffs;
             
         end
         
-    end
-        
+    end        
 
 end
 
