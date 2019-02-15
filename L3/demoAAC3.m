@@ -14,7 +14,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, fNameAACod
     % Set confset if none selected
     if ( nargin == 2 )
         
-       confset = ConfSets.Default; 
+       confset = ConfSets.Marios; 
         
     end
 

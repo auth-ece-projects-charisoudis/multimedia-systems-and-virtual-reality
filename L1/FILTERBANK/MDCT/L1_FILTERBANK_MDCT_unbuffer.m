@@ -32,6 +32,6 @@ function y = L1_FILTERBANK_MDCT_unbuffer( frames )
     end
 
     %% Extract Useful Samples
-    y = y( OVERLAP_LENGTH + 1:end - FRAME_LENGTH );
+    y = y( OVERLAP_LENGTH + 1 : end - FRAME_LENGTH );
 
 end
