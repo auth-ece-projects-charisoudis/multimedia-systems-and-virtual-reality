@@ -31,6 +31,10 @@ function binSeq = L3_AACODER_sec2bin( AACSeq3 )
             % TNS Coefficients are four ( 4 ) with 4 bits / coeff ( 4x4
             % char array ). The complete binary string will be 16 bits (
             % columnwise ).
+            %
+            % Revert back using:
+            %   - revert for ESH: reshape( AACSeq3(27).chl.TNScoeffs(:)', [4 4 8] )
+            %   - revert else   : reshape( AACSeq3(27).chl.TNScoeffs(:)', [4 4] )
             binSeq( frame_i ).(['ch' channel]).TNScoeffs = AACSeq3( frame_i ).(['ch' channel]).TNScoeffs( : )';
             
         end

@@ -83,18 +83,25 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
                 completed( b ) = 1;
                 
             end
+
+        end
         
-            % 2ND TERMNATION CASE: max( abs( diff( a ) ) ) > 60
-            if ( max( abs( diff( a ) ) ) > 59 )
+        % 2ND TERMNATION CASE: max( abs( diff( a ) ) ) >= 60
+        % Set all bands to completed state: QUANTIZER FINISHED
+        if ( max( abs( diff( a ) ) ) > 59 )
+
+            % Calculate uncompleted bands before exiting
+            for bb = band_indices( ~completed )
+
+                % Band Limits
+                wlow = std_table( bb, 2 ) + 1;
+                whigh = std_table( bb, 3 ) + 1;
 
                 % Quantize MDCT coeffs for this band
-                S( wlow : whigh ) = Sb;
-                
-                % Set all bands to completed state: QUANTIZER FINISHED
-                completed( : ) = true;
-                
-                % Break bands loop
-                break;
+                S( wlow : whigh ) = L3_AACQUANTIZER_quantize( frame( wlow : whigh ), a( bb ) );
+
+                % Mark as completed
+                completed( bb ) = true;
 
             end
 
