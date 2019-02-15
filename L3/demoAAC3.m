@@ -1,4 +1,4 @@
-function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
+function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, fNameAACoded, confset )
 %DEMOAAC3 Executes Level-3 AAC Codec and calculates SNR
 %   
 %   fNameIn: input wav's filename
@@ -24,7 +24,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
 
     %% Start!
     clear global
-    clearvars -except fNameIn fNameOut y NSAMPLES FS confset;
+    clearvars -except fNameIn fNameOut fNameAACoded y NSAMPLES FS confset;
     clc
     tic
     
@@ -86,7 +86,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     % Reconstructed
     %   - 48000 samples / sec
     %   - x bits / sample
-    total_bits = L3_AACODER_sec2bits( AACSeq3, fnameAACoded );
+    total_bits = L3_AACODER_sec2bits( AACSeq3, fNameAACoded );
     bitrate = total_bits / secs;
     
     %% Compute compression

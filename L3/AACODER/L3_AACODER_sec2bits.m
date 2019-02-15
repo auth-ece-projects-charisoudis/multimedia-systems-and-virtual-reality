@@ -1,4 +1,4 @@
-function bits = L3_AACODER_sec2bits( seq, fnameAACoded )
+function bits = L3_AACODER_sec2bits( seq, fNameAACoded )
 %L3_AACODER_SEC2BYTES Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -36,12 +36,13 @@ function bits = L3_AACODER_sec2bits( seq, fnameAACoded )
     %% Create compressed struct
     CompressedSeq = L3_AACODER_compress_sec( seq );
     
-    %% Write struct to mat-file
-    save fnameAACoded CompressedSeq;
+    %% Write struct to binary file
+    
+    save( fNameAACoded, 'CompressedSeq' );
     
     %% Read mat-file's filesize
-    finfo = dir( fnameAACoded );
-    bits = finfo.bytes * 8;
+    finfo = dir( fNameAACoded );
+    bits = 8 * finfo.bytes;
 
 end
 
