@@ -46,7 +46,6 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, fNameAACod
 %     plot( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) )
 %     title( ['max = ' num2str( max( abs( y_out( 1 : NSAMPLES, 1 ) - y( :, 1 ) ) ) ) ] )
     
-    
     % Trim output back to original number of samples
     y_out = y_out( 1 : NSAMPLES, : );
     
@@ -77,19 +76,29 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, fNameAACod
     snrOb = L1_AACODER_SnrCalculator( y, y_out );
     SNR = snrOb.mean;
     
-    %% Compute bitrate
-    % Original
-    secs = NSAMPLES / FS;
-    finfo = dir( fNameIn );
-    bitrate_original = ( finfo.bytes * 8 ) / secs;
-    
-    % Reconstructed
-    %   - 48000 samples / sec
-    %   - x bits / sample
-    total_bits = L3_AACODER_seq_size( AACSeq3, fNameAACoded );
-    bitrate = total_bits / secs;
-    
-    %% Compute compression
-    compression = bitrate / bitrate_original;
+    %% Compute bitrate & Compression
+    if ( confset == ConfSets.Marios_Huffman || confset == ConfSets.Default_Huffman )
+        
+        % Compute bitrate
+        % Original
+        secs = NSAMPLES / FS;
+        finfo = dir( fNameIn );
+        bitrate_original = ( finfo.bytes * 8 ) / secs;
+
+        % Reconstructed
+        %   - 48000 samples / sec
+        %   - x bits / sample
+        total_bits = L3_AACODER_seq_size( AACSeq3, fNameAACoded );
+        bitrate = total_bits / secs;
+
+        % Compute compression
+        compression = bitrate / bitrate_original;
+        
+    else
+        
+        bitrate = NaN;
+        compression = NaN;
+        
+    end
 
 end
