@@ -40,7 +40,7 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     %% Predictability Measure
     % Predictability for higher part of spectrum is set constant for long
     % frames, equal to 0.4
-    if ( NBANDS > 60 )
+    if ( NBANDS > 60 && false )
         
         c = [ sqrt( ...
             ( r( 1:6 ) .* cos( f( 1:6 ) ) - rpred( 1:6 ) .* cos( fpred( 1:6 ) ) ) .^ 2 + ...
@@ -87,11 +87,11 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     tb = -0.299 - 0.43 * log( cb );     % ln is 'log' in MATLAB
     
     % Clip indeces ( tonality index should be in range [0,1] )
-    tb( tb > 1 ) = 1;
-    tb( tb < 0 ) = 0;
-    
-    assert( all( tb <= 1 ) );
-    assert( all( tb >= 0 ) );
+%     tb( tb > 1 ) = 1;
+%     tb( tb < 0 ) = 0;
+%     
+%     assert( all( tb <= 1 ) );
+%     assert( all( tb >= 0 ) );
     
     %% SNR
     % TMN( b ) = 18dB constant for all bands
@@ -110,11 +110,10 @@ function SMR = L3_PSYCHO_psycho_mono( frames, spreading_matrix, hann_window, std
     % std_table' bands
     
     % Noise Level
-    qthr_hat = ( eps() * FRAME_LENGTH ) * ( 10 .^ ( 0.1 * std_table( :, 6 ) ) );
+    qthr_hat = eps() * ( FRAME_LENGTH - 1 ) * 10 .^ ( 0.1 * std_table( :, 6 ) );
     npart = max( nb, qthr_hat );
     
     %% Compute SMR
     SMR = e ./ npart;
      
 end
-

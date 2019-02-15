@@ -54,7 +54,7 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, confset )
     toc
     
     % Write Codec's output to file
-    if( nargout == 0 )
+    if( nargout == 0 || true )
        
         % if file exists, tweak fNameOut by adding a Level_3 indicator
         if isfile( fNameOut )

@@ -34,9 +34,6 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
     FRAME_LENGTH = length( frameT );
     global AACONFIG
     
-    % Previous frame for ESH frames
-    global ESH_frameTprev1 ESH_frameTprev2
-    
     %% Load Standard's Tables
     %  - B219a: for Long Windows
     %  - B219b: for Short Windows
@@ -101,68 +98,35 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         SMR = zeros( length( spreading_matrix ), 8 );
         
         % Extract Sub-Frames ( for current )
-        subframes = buffer( frameT( 449 : end - 448 ), 256, 128 );
+        subframes = buffer( frameT( 449 : end - 448 ), 256, 128, 'nodelay' );
+        subframe_i_start = 1;
         
-        % Initial Assignment of previous frames
-        switch( AACONFIG.L3.ON_PREV_MISSING_POLICY )
+        % Initial Assignment of previous frames if previous frames are
+        % zeros
+        if ( all( frameTprev1 == 0 ) )
             
-            case L3_PSYCHO_MissingPolicies.Defer
-                % Defer computation of first 2 subframes until 3rd's SMR
-                % has been computed. Then copy this result for the
-                % preceding two subframes.
-                % ATTENTION: This strategy is used ONLY for the 1st ESH
-                % frame in the song. For the following ESH frames, the last
-                % two subframes of the previous ESH frame are used.
-                if ( isempty( ESH_frameTprev1 ) )
-                
+            switch( AACONFIG.L3.ON_PREV_MISSING_POLICY )
+
+                case L3_PSYCHO_MissingPolicies.Defer
+                    % Defer computation of first 2 subframes until 3rd's SMR
+                    % has been computed. Then copy this result for the
+                    % preceding two subframes.
+                    % ATTENTION: This strategy is used ONLY for the 1st ESH
+                    % frame in the song. For the following ESH frames, the last
+                    % two subframes of the previous ESH frame are used.
                     frameTprev1 = subframes( :, 2 );
                     frameTprev2 = subframes( :, 1 );
                     subframe_i_start = 3;
-                    
-                else
-                    
-                    frameTprev1 = ESH_frameTprev1;
-                    frameTprev2 = ESH_frameTprev2;
-                
-                end
-                
-            case L3_PSYCHO_MissingPolicies.Zeros
-                
-                if ( isempty( ESH_frameTprev1 ) )
-                    
-                    frameTprev1 = zeros( FRAME_LENGTH / 8, 1 );
-                    frameTprev2 = zeros( FRAME_LENGTH / 8, 1 );
-                    
-                else
-                    
-                    frameTprev1 = ESH_frameTprev1;
-                    frameTprev2 = ESH_frameTprev2;
-                
-                end
-                    
-                subframe_i_start = 1;
-        	
-            case L3_PSYCHO_MissingPolicies.SameAsFirst
-                
-                if ( isempty( ESH_frameTprev1 ) )
-                    
-                    frameTprev1 = subframes( :, 1 );
+
+                case L3_PSYCHO_MissingPolicies.Zeros
+                    % nothing to do...
+
+                case L3_PSYCHO_MissingPolicies.SameAsFirst
+
+                    frameTprev1 = subframes( :, 2 );
                     frameTprev2 = subframes( :, 1 );
-                    
-                else
-                    
-                    frameTprev1 = ESH_frameTprev1;
-                    frameTprev2 = ESH_frameTprev2;
-                
-                end
-                
-                subframe_i_start = 1;
-                
-        end
-        
-        if ( AACONFIG.DEBUG )
-            
-            sprintf( '\t\tbefore ESH loop' )
+
+            end
             
         end
         
@@ -170,37 +134,27 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
         for subframe_i = subframe_i_start : 8
             
             % Get one new subframe
-            frameT = subframes( :, subframe_i );
+            subframeT = subframes( :, subframe_i );
             
             % Compute SMR
             SMR( :, subframe_i ) = L3_PSYCHO_psycho_mono( ...
-                [ frameT, frameTprev1, frameTprev2 ], ...
+                [ subframeT, frameTprev1, frameTprev2 ], ...
                 spreading_matrix, hann_window, B219b ...
             );
         
             % Slide previous frames
             frameTprev2 = frameTprev1;
-            frameTprev1 = frameT;
+            frameTprev1 = subframeT;
             
         end
         
-        if ( AACONFIG.DEBUG )
+        % Check if Defered execution has been selected and if yes, copy SMR
+        % of 3rd subframe two preceeding subframes
+        for subframe_i = 1 : subframe_i_start - 1
             
-            sprintf( '\t\after ESH loop' )
-            
+            SMR( :, subframe_i ) = SMR( :, subframe_i_start );
+
         end
-        
-        % Check if Defered execution has been selected
-        if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
-           
-            SMR( :, 1 ) = SMR( :, 3 );
-            SMR( :, 2 ) = SMR( :, 3 );
-            
-        end
-        
-        % Save last two frames for next ESH frame
-        ESH_frameTprev1 = subframes( :, 8 );
-        ESH_frameTprev2 = subframes( :, 7 );
         
     else
         
@@ -213,110 +167,3 @@ function SMR = psycho( frameT, frameType, frameTprev1, frameTprev2 )
     end
 
 end
-
-
-% function SMR = psycho(frameT, frameType, frameTprev1, frameTprev2)
-% %UNTITLED2 Summary of this function goes here
-% %   Detailed explanation goes here
-%     %load tables
-%     load('TableB219.mat');
-%     load('spreadingTables.mat');
-%     
-%     frameType = L1_SSC_Frametypes.getShortCode( frameType );
-%     
-%     % initialize parameters
-%     if strcmp(frameType,'ESH')
-%         N = 256;
-%         sub = 8;
-%         start = 449;
-%         finish = 1600;
-%         table = B219b;
-%         spr = short;
-%     else
-%         N= 2048;
-%         sub = 1;
-%         start = 1;
-%         finish = N;
-%         table = B219a;
-%         spr = long;
-%     end
-%     %Hann window
-%     n = 0:N-1;
-%     w = 0.5 - 0.5*cos(pi*(n+0.5)/N);
-%     w = w(:);
-%     
-%     sw(:,1) = w.*frameTprev2;
-%     sw(:,2) = w.*frameTprev1;
-%     
-%     sub_frames = buffer(frameT(start:finish), N, N/2);
-%     sw(:,3:2+sub) = diag(sparse(w))*sub_frames(:, 2:end);
-%     
-%     frameF = fft(sw);
-%     
-%     f = angle(frameF);
-%     r = abs(frameF);
-%     
-%     f = f(1:N/2+1, :);
-%     r = r(1:N/2+1, :);
-%     
-%     rpred = 2*r(:,2:sub+1) - r(:,1:sub);
-%     fpred = 2*f(:,2:sub+1) - f(:,1:sub);
-% 
-%     t1 = r(:,3:end).*cos(f(:,3:end)) - rpred.*cos(fpred);
-%     t2 = r(:,3:end).*sin(f(:,3:end)) - rpred.*sin(fpred);
-%         
-%     ac = r(:,3:end).*exp(1j*f(:,3:end));
-%     rr = rpred.*exp(1j*fpred);
-%     tt = abs(rr-ac);
-%     cw1 = tt./(r(:,3:end)+abs(rpred));
-%     cw = sqrt(t1.^2 + t2.^2)./(r(:,3:end)+abs(rpred));
-%         
-%     bands = max(size(table));
-%     b_start = table(:,2)+1;
-%     b_end = table(:,3)+1;
-%             
-%     e = zeros(bands, sub);
-%     c = e;
-%     
-%     r_sq = r(:,3:sub+2).^2;
-%     a = cw.*r_sq;
-%     
-%     for j=1:bands
-%         e(j,:) = sum(r_sq(b_start(j):b_end(j),:),1);
-%         c(j,:) = sum(a(b_start(j):b_end(j),:),1);
-%     end
-%     
-%     ecb = (spr')*e;
-%     ct = (spr')*c;
-% 
-%     sumsp = sum(spr, 1);
-% 
-%     sumspread = sumsp(:);
-%     sumspread = ones(bands,1)./sumspread;
-% 
-%     cb = ct./ecb;
-%     en = diag(sparse(sumspread))*ecb;
-%     
-%     tb = -0.299 - 0.43*log(cb);
-% %     tb(tb>1) = 1;
-% %     tb(tb<0) = 0;
-% 
-%     nmt = 6;
-%     tmn = 18;
-%     SNR = tb*tmn + (1-tb)*nmt;
-%     
-%     bc = 10.^(-SNR/10);
-%     
-%     nb = en.*bc;
-%     
-%     qthr = eps()*N/2*10.^(table(:,6)/10);
-%     
-%     npart = zeros(bands,sub);
-% 
-%     for i=1:sub        
-%             npart(:,i) = max(nb(:,i), qthr);
-%     end
-%     
-%     SMR = e./npart;
-%     
-% end

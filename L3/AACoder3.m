@@ -79,9 +79,7 @@ function AACSeq3 = AACoder3( fNameIn, confset )
 
         end
         
-        % ESH
-        clearvars -global ESH_frameTprev1 ESH_frameTprev2
-        
+        % Reset ESH previous time frames ( used in psycho_mono() )        
         frameTprev1S_C = zeros( 256, 1);
         frameTprev2S_C = zeros( 256, 1);
 
@@ -89,6 +87,8 @@ function AACSeq3 = AACoder3( fNameIn, confset )
         deferred_execution = false;
         for frame_i = frame_indices_sequence
 
+%             frame_i
+            
             if ( AACONFIG.DEBUG )
 
                 sprintf( ...
@@ -102,52 +102,58 @@ function AACSeq3 = AACoder3( fNameIn, confset )
             %% Per channel staff
             %   - save frame in time
             frameT_C = AACSeq3( frame_i ).(['ch' channel]).frameT;
+            
+            %   - check if frame is EightShott
+            is_esh = AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort;
 
             %   - compute SMR
-            if ( ~deferred_execution )
+            if ( ~deferred_execution )                
 
-                SMR_C = psycho( ...
-                    frameT_C, ...
-                    AACSeq3( frame_i ).frameType, ...
-                    frameTprev1_C, frameTprev2_C ...
-                );
-            
+                % NOTICE: on ESH frames, previous frames are the last two
+                % sub-frames from the last ESH frame of the encoder
+                if ( is_esh )
+                    
+                    SMR_C = psycho( ...
+                        frameT_C, ...
+                        AACSeq3( frame_i ).frameType, ...
+                        frameTprev1S_C, frameTprev2S_C ...
+                    );
+                    
+                else
+
+                    SMR_C = psycho( ...
+                        frameT_C, ...
+                        AACSeq3( frame_i ).frameType, ...
+                        frameTprev1_C, frameTprev2_C ...
+                    );
+                    
+                end
+
                 %   - slide Frames
-                if ( AACSeq3( frame_i ).frameType ~= L1_SSC_Frametypes.EightShort)
+                if ( is_esh )
+                    
+                    FRAME_LENGTH_S = FRAME_LENGTH / 8;
+                    
+                    fp1s_start = FRAME_LENGTH - FRAME_LENGTH_S - 447;
+                    fp1s_end = FRAME_LENGTH - 448;
+                    
+                    fp2s_start = FRAME_LENGTH - 448 - FRAME_LENGTH_S - FRAME_LENGTH_S / 2 + 1;
+                    fp2s_end = FRAME_LENGTH - 448 - FRAME_LENGTH_S / 2;
+                    
+                    frameTprev1S_C( :, 1 ) = frameT_C( fp1s_start : fp1s_end );
+                    frameTprev2S_C( :, 1 ) = frameT_C( fp2s_start : fp2s_end );
+                    
+                else
 
                     frameTprev2_C = frameTprev1_C;
                     frameTprev1_C = frameT_C;
 
                 end
-% 
-%                 if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-%                     
-%                     SMR_C = psycho( ...
-%                         frameT_C, ...
-%                         AACSeq3( frame_i ).frameType, ...
-%                         frameTprev1S_C, frameTprev2S_C ...
-%                     );
-%                 
-%                     frameTprev1S_C = frameT_C(1345:1600,:);
-%                     frameTprev2S_C = frameT_C(1217:1472,:);
-%                     
-%                 else
-%                    
-%                     SMR_C = psycho( ...
-%                         frameT_C, ...
-%                         AACSeq3( frame_i ).frameType, ...
-%                         frameTprev1_C, frameTprev2_C ...
-%                     );
-%                 
-%                     frameTprev2_C = frameTprev1_C;
-%                     frameTprev1_C = frameT_C;
-%                     
-%                 end
                     
             else
 
-                % SMR_L retains its last value, thus 3rd frame's SMR ( for 
-                % left channel )
+                % SMR_C retains its last value, thus 3rd frame's SMR ( for 
+                % left & right channel )
 
             end
 
@@ -166,42 +172,22 @@ function AACSeq3 = AACoder3( fNameIn, confset )
                     encodeHuff( S, HUFFMAN_LUT );
 
                 % encode sfcs
-                if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS )
+                if ( is_esh )
+                    
+                    AACSeq3( frame_i ).(['ch' channel]).sfc = strings( 8, 1 );
+                    for subframe_i = 1 : 8
 
-                    if ( AACSeq3( frame_i ).frameType == L1_SSC_Frametypes.EightShort )
-                                                
-                        % Huffman encode
-                        if ( AACONFIG.L3.HUFFMAN_ENCODE_SFCS_COMBINED )
-
-                            % Combine sfcs
-                            AACSeq3( frame_i ).(['ch' channel]).sfc = ...
-                                encodeHuff( sfc( : ), HUFFMAN_LUT, 12 );
-                            
-                        else
-
-                            AACSeq3( frame_i ).(['ch' channel]).sfc = strings( 8, 1 );
-                            for subframe_i = 1 : 8
-
-                                % Get huffman bit-sequence
-                                AACSeq3( frame_i ).(['ch' channel]).sfc( :, subframe_i ) = ...
-                                    encodeHuff( sfc( :, subframe_i ), HUFFMAN_LUT, 12 );
-
-                            end
-                        
-                        end
-
-                    else
-                        
                         % Get huffman bit-sequence
-                        AACSeq3( frame_i ).(['ch' channel]).sfc = ...
-                            encodeHuff( sfc, HUFFMAN_LUT, 12 );
-
+                        AACSeq3( frame_i ).(['ch' channel]).sfc( subframe_i ) = ...
+                            encodeHuff( sfc( :, subframe_i ), HUFFMAN_LUT, 12 );
                     end
-
+                    
                 else
-
-                    AACSeq3( frame_i ).(['ch' channel]).sfc = sfc;
-
+                    
+                    % Get huffman bit-sequence
+                    AACSeq3( frame_i ).(['ch' channel]).sfc = ...
+                            encodeHuff( sfc, HUFFMAN_LUT, 12 );
+                    
                 end
 
             else
@@ -236,4 +222,3 @@ function AACSeq3 = AACoder3( fNameIn, confset )
     AACONFIG.L1.L3_ENCODER_RUNNING = false;
     
 end
-

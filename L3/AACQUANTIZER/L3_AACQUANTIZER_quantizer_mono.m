@@ -14,10 +14,9 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     FRAME_LENGTH = length( frame );
     NBANDS = length( SMR );
     
-    persistent MQ MagicNumber
-    MagicNumber = 0.4054;
+    persistent MQ
     MQ = 8191;
-
+    
     %% MDCT Coefficients' Energy
     P = zeros( NBANDS, 1 );
     for b = 1 : NBANDS
@@ -37,51 +36,69 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
     S = zeros( FRAME_LENGTH, 1 );
     a = zeros( NBANDS, 1 );
     
+    % Initialize band indices
+    band_indices = 1 : NBANDS;
+    completed = false( NBANDS, 1 );
+    
     % Initial Approximation Step
     a0 = ( 16 / 3 ) * log2( max( frame ) ^ 0.75 / MQ );
     a( : ) = a0;
     
     % Optimization Step
-    for b = 1 : NBANDS
+    %   In each calculation step, we compute the quantization noise power
+    %   for each band. After that, the respective sfc is either incremented
+    %   or decremented by 1. The procedure continues until either all band
+    %   powers have become greater than band's auditity threshold or the
+    %   diff( sfcs ) is greater than or equal to 60.
+    while ~all( completed )
         
-        % Band Limits
-        wlow = std_table( b, 2 ) + 1;
-        whigh = std_table( b, 3 ) + 1;
-        
-        Pe = T( b );
-        while ( Pe <= T( b ) && max( abs( diff( a ) ) ) <= 59 )
-            
-            % Increment sfc ( lowers quantizer's quality in this band )
-            a( b ) = a( b ) + 1;
+        for b = band_indices( ~completed )
 
-            % Quantize frame coefficients        
-            Sb_quantized = L2_TNS_QUANTIZER_sgn( frame( wlow : whigh ) ) .* ...
-                floor( ...
-                    ( 2^( -0.25 * a( b ) ) * abs( frame( wlow : whigh ) ) ) ...
-                    .^ 0.75 + MagicNumber ...
-                ) ...
-            ;
-        
-            % Dequantize frame coefficients
-            frame_hat = L2_TNS_QUANTIZER_sgn( Sb_quantized ) .* ( ...
-                abs( Sb_quantized ) .^ (4 / 3) * 2^( 0.25 * a( b ) ) ...
-            );
-                
-        
-            % Calculate Quntization Noise Power
-            Pe = sumsqr( frame( wlow : whigh ) - frame_hat );
+            % Band Limits
+            wlow = std_table( b, 2 ) + 1;
+            whigh = std_table( b, 3 ) + 1;
             
-        end
+            % Quantization-noise power in band
+            Sb = L3_AACQUANTIZER_quantize( frame( wlow : whigh ), a( b ) );
+            Pe = sumsqr( frame( wlow : whigh ) - ...
+                L3_AACQUANTIZER_dequantize( Sb, a( b ) ) ...
+            );
         
-        % Revert to last a( b ) & re-calculate quantized frequency samples
-        a( b ) = a( b ) - 1;
-        S( wlow : whigh ) = ...
-            L2_TNS_QUANTIZER_sgn( frame( wlow : whigh ) ) .* ...
-            floor( ...
-                ( 2^( -0.25 * a( b ) ) * abs( frame( wlow : whigh ) ) ) ...
-                .^ 0.75 + MagicNumber ...
-            ) ...
-        ;
+            % If above power is below auditity threshold, incement a( b )
+            % else decrement a( b ) and mark this band as completed
+            if ( Pe < T( b ) )
+                
+                % Increment sfc ( lowers quantizer's quality in this band )
+                a( b ) = a( b ) + 1;
+                
+            else
+                
+                % Revert back sfc
+                a( b ) = a( b ) - 1;
+                
+                % Quantize MDCT coeffs for this band
+                S( wlow : whigh ) = L3_AACQUANTIZER_quantize( frame( wlow : whigh ), a( b ) );
+                
+                % Mark band as completed
+                completed( b ) = 1;
+                
+            end
+        
+            % 2ND TERMNATION CASE: max( abs( diff( a ) ) ) > 60
+            if ( max( abs( diff( a ) ) ) > 59 )
+
+                % Quantize MDCT coeffs for this band
+                S( wlow : whigh ) = Sb;
+                
+                % Set all bands to completed state: QUANTIZER FINISHED
+                completed( : ) = true;
+                
+                % Break bands loop
+                break;
+
+            end
+
+        end
     
     end
     
