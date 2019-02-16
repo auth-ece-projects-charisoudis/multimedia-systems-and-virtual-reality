@@ -15,4 +15,3 @@ function Sb = L3_AACQUANTIZER_quantize( frameFB, ab )
         ( 2^( -0.25 * ab ) * abs( frameFB ) ) .^ 0.75 + MagicNumber );
     
 end
-

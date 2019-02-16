@@ -88,7 +88,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         
         % 2ND TERMNATION CASE: max( abs( diff( a ) ) ) >= 60
         % Set all bands to completed state: QUANTIZER FINISHED
-        if ( max( abs( diff( a ) ) ) >= 60 )
+        if ( max( abs( diff( a ) ) ) >= 59 )
 
             % Calculate uncompleted bands before exiting
             for bb = band_indices( ~completed )

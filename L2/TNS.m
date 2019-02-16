@@ -27,12 +27,12 @@ function [ frameFout, TNScoeffs ] = TNS( frameFin, frameType )
             
             % Init output arguments
             frameFout = zeros( frameFin_size );
-%             TNScoeffs = zeros( 4, 4, frameFin_size( 2 ) );
+            TNScoeffs = strings( 4, frameFin_size( 2 ) );
             
             % Apply TNS to each sub-MDCT
             for sub_frame_i = 1 : frameFin_size( 2 )
                
-                [ frameFout( :, sub_frame_i ), TNScoeffs( :, :, sub_frame_i ) ] ...
+                [ frameFout( :, sub_frame_i ), TNScoeffs( :, sub_frame_i ) ] ...
                     = L2_TNS_tns_mono( frameFin( :, sub_frame_i ), B219b );
                 
             end

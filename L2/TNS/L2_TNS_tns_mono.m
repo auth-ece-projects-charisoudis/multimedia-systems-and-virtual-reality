@@ -28,7 +28,7 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
         P( b ) = sumsqr( frameFin( klow : khigh ) );
 
         % Normalizing Coefficients for this Band
-        Sw( klow : khigh ) = 1 / sqrt( P ( b ) );
+        Sw( klow : khigh ) = 1 / sqrt( P( b ) );
 
     end
     
@@ -54,6 +54,13 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     % Compute directly via lpc
     A = lpc( Xw, 4 );
     A = -A( 2 : end );
+%     % Compute analytically
+%     [c, lags] = xcov( Xw, 4 );
+%     c = c / c( lags == 0 );
+%     re = c( lags >= 0 );
+%     r = c( lags > 0 );
+%     R = toeplitz( re( 1 : end - 1 ) );
+%     A = R \ r;
     
     % Quantize
     TNScoeffs = L2_TNS_QUANTIZER_quantizer_uniform_midrise( A, 4, 0.1 );
@@ -64,50 +71,20 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     num = [1; -TNSceffs_hat];
     denom = 1;
     
-    % Check if INVERSE filter is stable 
+    % Check if INVERSE filter is stable, and if not apply stabilization in
+    % numinator ( inverse's denominator )
     if ( ~isstable( denom, num ) )
-        
-        num_roots = roots( num );
-        in = find( abs( num_roots ) > 0.98 );
-        
-        num_roots( in ) = num_roots( in ) ./ ( abs( num_roots( in ) ) + 0.15 );
-        num = poly( num_roots );
+                
+        % Using MATLAB's builtin polystab()
+        num = polystab( num );
+
+        % Re-assess filter stability
+        assert( isstable( denom, num ) )
         
     end
-    
-    assert( isstable( denom, num ) )
     
     % Perform the actual filtering
     frameFout = filter( num, denom, frameFin );
     
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

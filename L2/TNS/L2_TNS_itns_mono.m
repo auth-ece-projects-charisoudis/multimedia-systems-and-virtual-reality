@@ -18,18 +18,19 @@ function frameFout = L2_TNS_itns_mono( frameFin, TNScoeffs )
     num = 1;
     denom = [1; -TNSceffs_hat];
         
+    % Check if filter is stable, and if not apply stabilization in
+    % denominator
     if ( ~isstable( num, denom ) )
-        
-        r = roots( denom );
-        in = find( abs( r ) > 0.98 );
-        
-        r( in ) = r( in ) ./ ( abs( r( in ) ) + 0.15 );
-        denom = poly( r );
+                
+        % Using MATLAB's builtin polystab()
+        denom = polystab( denom );
+
+        % Re-assess filter stability
+        assert( isstable( num, denom ) )
         
     end
     
     % Perform the actual reverse-filtering
-    assert( isstable( num, denom ) )
     frameFout = filter( num, denom, frameFin );
     
 end
