@@ -66,7 +66,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         
             % If above power is below auditity threshold, incement a( b )
             % else decrement a( b ) and mark this band as completed
-            if ( Pe < T( b ) )
+            if ( Pe <= T( b ) )
                 
                 % Increment sfc ( lowers quantizer's quality in this band )
                 a( b ) = a( b ) + 1;
@@ -88,7 +88,7 @@ function [ S, sfc, G ] = L3_AACQUANTIZER_quantizer_mono( frame, SMR, std_table )
         
         % 2ND TERMNATION CASE: max( abs( diff( a ) ) ) >= 60
         % Set all bands to completed state: QUANTIZER FINISHED
-        if ( max( abs( diff( a ) ) ) >= 59 )
+        if ( max( abs( diff( a ) ) ) >= 60 )
 
             % Calculate uncompleted bands before exiting
             for bb = band_indices( ~completed )
