@@ -13,6 +13,7 @@ function frameFout = L2_TNS_itns_mono( frameFin, TNScoeffs )
     %% Un-Filter produced MDCT Coeffs to reconstruct original    
     % Dequantize TNScoeffs
     TNSceffs_hat = L2_TNS_QUANTIZER_dequantizer_uniform_midrise( TNScoeffs, 4, 0.1 );
+%     TNSceffs_hat = unquantizeTNS( TNScoeffs );
     
     % Set numerator denominator coefs
     num = 1;

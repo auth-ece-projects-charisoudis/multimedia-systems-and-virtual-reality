@@ -9,30 +9,36 @@ function output = L2_TNS_QUANTIZER_dequantizer_uniform_midrise( symbol, R, Delta
 %   output: number quantized with R bits
 %
 
-    %% Vector Input
-    NINPUTS = size( symbol, 1 );
-    if ( NINPUTS > 1 )
-       
-        output = zeros( NINPUTS, 1 );
+    global scalarDequantizer
+
+    %% DeQuantizer Data
+    %   - Number of Bins ( N to the left + N to the right of y-axis )
+    N = 2 ^ ( R - 1 );
+
+    %   - Range ( -xmax to xmax )
+    xmax =  Delta  * N;
+
+    % Builtin method's args
+    output_codebook = -xmax + Delta: Delta : xmax;
+    output_codebook = output_codebook - Delta * 0.5;
+
+    %% Quantize
+    % Get dec value
+    indices = int32( bin2dec( symbol ) );
         
-        for symbol_i = 1 : NINPUTS
-           
-            output( symbol_i ) = L2_TNS_QUANTIZER_dequantizer_uniform_midrise( ...
-                symbol( symbol_i, : ), R,  Delta ...
-            );
-            
-        end
+    % Initialize Quantizer
+    if ( isempty( scalarDequantizer ) )
         
-    else
-        % Get dec value
-        symbol = L2_TNS_QUANTIZER_bin2dec( symbol, 4 );
+        scalarDequantizer = dsp.ScalarQuantizerDecoder;
+
+        % Set params
+        scalarDequantizer.CodebookSource = 'Property';
+        scalarDequantizer.Codebook = output_codebook;
         
-        %% DeQuantize
-        number_sign = sign( symbol );
-        bin = ( symbol - number_sign ) / number_sign + 0.0;
-        output = number_sign * ( 0.5 + bin ) * Delta;
-    
     end
+
+    % Execute
+    output = scalarDequantizer( indices );
     
 end
 

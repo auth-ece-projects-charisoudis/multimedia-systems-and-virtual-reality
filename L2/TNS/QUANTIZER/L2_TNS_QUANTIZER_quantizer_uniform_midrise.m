@@ -10,91 +10,36 @@ function symbol = L2_TNS_QUANTIZER_quantizer_uniform_midrise( input, R, Delta )
 %   belongs to
 %
 
-    %% Vector Input
-    NINPUTS = length( input );
-    if ( NINPUTS > 1 )
-       
-%         symbol = char( NINPUTS, 1 );
+    global scalarQuantizer
+
+    %% Quantizer Data
+    %   - Number of Bins ( N to the left + N to the right of y-axis )
+    N = 2 ^ ( R - 1 );
+
+    %   - Range ( -xmax to xmax )
+    xmax =  Delta  * N;
+
+    % Builtin method's args
+    codebook = -N : N - 1;
+    boundary = -xmax : Delta : xmax;
+
+    %% Quantize
+    % Initialize Quantizer
+    if ( isempty( scalarQuantizer ) )
         
-        for input_i = 1 : NINPUTS
-           
-            symbol( input_i, : ) = L2_TNS_QUANTIZER_quantizer_uniform_midrise( ...
-                input( input_i ), R,  Delta ...
-            );
-            
-        end
+        scalarQuantizer = dsp.ScalarQuantizerEncoder;
+
+        % Set params
+        scalarQuantizer.BoundaryPoints = boundary;
+        scalarQuantizer.CodewordOutputPort = true;
+        scalarQuantizer.Codebook = codebook;
         
-    else
-        
-        %% Quantizer Data
-        %   - Number of Bins ( N to the left + N to the right of y-axis )
-        N = 2 ^ ( R - 1 );
-
-        %   - Range ( -xmax to xmax )
-        xmax =  Delta  * N;
-
-        %% Quantize
-        number_abs = abs( input );
-        number_sign = L2_TNS_QUANTIZER_sgn( input );
-
-        % Check if outsite of range
-        if ( number_abs >= xmax )
-
-            symbol = number_sign * ( N - 1 ) + number_sign;
-
-        end
-
-        % Normal Quantization
-        for bin = 0 : N - 1
-
-            if ( bin * Delta <= number_abs && number_abs < ( bin + 1 ) * Delta )
-                
-                symbol = number_sign * bin + number_sign;
-                break
-
-            end
-
-        end
-        
-        % Convert to binary string
-        symbol = L2_TNS_QUANTIZER_dec2bin( symbol, 4 );
-    
     end
+
+    % Execute
+    [indices, ~] = scalarQuantizer( input );
+
+    % Convert to binary string
+    symbol = dec2bin( indices, 4 );
     
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

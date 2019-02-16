@@ -35,7 +35,8 @@ function binSeq = L3_AACODER_sec2bin( AACSeq3 )
             % Revert back using:
             %   - revert for ESH: reshape( AACSeq3(27).chl.TNScoeffs(:)', [4 4 8] )
             %   - revert else   : reshape( AACSeq3(27).chl.TNScoeffs(:)', [4 4] )
-            binSeq( frame_i ).(['ch' channel]).TNScoeffs = AACSeq3( frame_i ).(['ch' channel]).TNScoeffs( : )';
+            temp = char( AACSeq3( frame_i ).(['ch' channel]).TNScoeffs );
+            binSeq( frame_i ).(['ch' channel]).TNScoeffs = temp( : );
             
         end
         
