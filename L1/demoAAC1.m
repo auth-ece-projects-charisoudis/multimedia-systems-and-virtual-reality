@@ -12,7 +12,7 @@ function SNR = demoAAC1( fNameIn, fNameOut, confset )
     % Set confset if none selected
     if ( nargin == 2 )
         
-       confset = ConfSets.Default; 
+       confset = ConfSets.Marios; 
         
     end
     

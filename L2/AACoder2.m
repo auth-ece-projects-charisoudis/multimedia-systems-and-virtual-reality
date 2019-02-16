@@ -12,7 +12,7 @@ function AACSeq2 = AACoder2( fNameIn, confset )
     % Configuration Set
     if ( nargin == 1 )
         
-       confset = ConfSets.Default;
+       confset = ConfSets.Marios;
         
     end
 
