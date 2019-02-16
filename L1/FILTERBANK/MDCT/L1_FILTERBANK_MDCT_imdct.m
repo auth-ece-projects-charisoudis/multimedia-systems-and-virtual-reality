@@ -12,7 +12,10 @@ function xn = L1_FILTERBANK_MDCT_imdct( Xk )
 %
 % ------- imdct.m ------------------------------------------
 % Thanos Charisoudis, achariso@ece.auth.gr
-%  
+% Credits: Marina Bosi
+%       - Introduction to Digital Audio Coding and Standards
+%       - Chapter 5: Time to Frequency Mapping: MDCT
+%          ( algo described @ page 142 - 143 )
 % ----------------------------------------------------------
 %
 
@@ -36,7 +39,7 @@ function xn = L1_FILTERBANK_MDCT_imdct( Xk )
     c2 = exp( ( ( 1i * pi ) / N ) * ( n + n0 ) );
 
     %% Pre-twiddle ( multiplication with complex term )
-    Xk_extended = [ Xk; -flipud( Xk ) ];
+    Xk_extended = [ Xk; -flipud( Xk ) ] * sqrt( 2 * K );
     Xk_pre_twiddled = c1 .* Xk_extended;
 
     %% N-point Inverse FFT

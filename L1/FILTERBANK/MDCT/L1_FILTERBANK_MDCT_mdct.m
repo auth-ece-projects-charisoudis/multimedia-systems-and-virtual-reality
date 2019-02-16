@@ -55,6 +55,6 @@ function Xk = L1_FILTERBANK_MDCT_mdct( xn )
     Xk_post_twiddled = c2 .* Xk_untwiddled( 1 : K );
 
     %% Real
-    Xk = real( Xk_post_twiddled );
+    Xk = real( Xk_post_twiddled ) / sqrt( N );
 
 end

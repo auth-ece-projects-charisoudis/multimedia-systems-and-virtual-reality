@@ -2,6 +2,12 @@ function frameType = SSC( ~, nextFrameT, prevFrameType )
 %SSC Sequence Segmentatio Control
 %   Finds the frame type for each frame in the frame sequence
 % 
+%   frameT: current frame in time
+%   nextFrameT: next frame in time
+%   prevFrameType: previous frame's type ( see L1_SSC_Frametypes )
+% 
+%   frameType: computed frame type for current frame
+% 
 
     %% Global Settings
     global AACONFIG
