@@ -86,8 +86,6 @@ function AACSeq3 = AACoder3( fNameIn, confset )
         %  - run
         deferred_execution = false;
         for frame_i = frame_indices_sequence
-
-%             frame_i
             
             if ( AACONFIG.DEBUG )
 
