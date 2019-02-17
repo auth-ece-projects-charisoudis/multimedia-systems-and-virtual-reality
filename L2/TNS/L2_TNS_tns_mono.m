@@ -51,22 +51,20 @@ function [ frameFout, TNScoeffs ] = L2_TNS_tns_mono( frameFin, std_table )
     Xw = frameFin ./ Sw;
     
     %% Linear Predictor Coefficients
-%     % Compute directly via lpc
-%     A = lpc( Xw, 4 );
-%     A = -A( 2 : end );
-    % Compute analytically
-    [c, lags] = xcov( Xw, 4 );
-    c = c / c( lags == 0 );
-    re = c( lags >= 0 );
-    r = c( lags > 0 );
-    R = toeplitz( re( 1 : end - 1 ) );
-    A = R \ r;
+    % Compute directly via lpc
+    A = lpc( Xw, 4 );
+    A = -A( 2 : end );
+%     % Compute analytically
+%     [c, lags] = xcov( Xw, 4 );
+%     c = c / c( lags == 0 );
+%     re = c( lags >= 0 );
+%     r = c( lags > 0 );
+%     R = toeplitz( re( 1 : end - 1 ) );
+%     A = R \ r;
     
     % Quantize
     TNScoeffs = L2_TNS_QUANTIZER_quantizer_uniform_midrise( A, 4, 0.1 );
     TNSceffs_hat = L2_TNS_QUANTIZER_dequantizer_uniform_midrise( TNScoeffs, 4, 0.1 );
-%     TNScoeffs = quantizeTNS( A );
-%     TNSceffs_hat = unquantizeTNS( TNScoeffs );
     
     %% Filter Initial MDCT Coeffs
     % Set numerator denominator coefs
