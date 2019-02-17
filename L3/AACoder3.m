@@ -198,8 +198,8 @@ function AACSeq3 = AACoder3( fNameIn, confset )
             %% Deferred Execution ( if chosen )
             if ( AACONFIG.L3.ON_PREV_MISSING_POLICY == L3_PSYCHO_MissingPolicies.Defer )
                 % On first loop's end, the 3rd frame has been processed and
-                % thus its SMR can be used for the deferred execution of the 2
-                % preceeding frames. 
+                % thus, its SMR can be used for the deferred execution of the 2
+                % preceding frames. 
                 % So, at this point, we activate the
                 % deferred_execution flag and set the frame index variable to
                 % the last deferred frame, gradually decrementing its value
