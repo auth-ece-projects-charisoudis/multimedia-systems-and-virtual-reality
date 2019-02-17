@@ -87,7 +87,29 @@ function [ SNR, bitrate, compression ] = demoAAC3( fNameIn, fNameOut, fNameAACod
         % Compute bitrate
         % Original
         secs = NSAMPLES / FS;
-        finfo = dir( fNameIn );
+        % WARNING: fNameIn may not be in current directory
+        % Solution: cd to that dir, call dir(), and then revert to previous
+        % working directory
+        fnamein_path = fileparts( which( fNameIn ) );
+        if ( ~strcmp( pwd, fnamein_path ) )
+            
+            % save current wd
+            wd = pwd;
+            
+            % Change to the dir where the fNameIn resides
+            cd( fnamein_path );
+            
+            % execute dir()
+            finfo = dir( fNameIn );
+            
+            % restore wd
+            cd( wd );
+            
+        else
+            
+            finfo = dir( fNameIn );
+            
+        end
         total_bits_original = finfo.bytes * 8;
 %         bitrate_original = total_bits_original / secs;
 
