@@ -24,16 +24,20 @@ function SNR = demoAAC1( fNameIn, fNameOut, confset )
     clear global
     clearvars -except fNameIn fNameOut y confset;
     clc
-    tic
+    demoaac1_tic = tic;
     
     %% Encoder
+    aacoder1_tic = tic;
     AACSeq1 = AACoder1( fNameIn, confset );
+    aacoder1_toc = toc( aacoder1_tic );
     
     %% Decoder
+    iaacoder1_tic = tic;
     y_out = iAACoder1( AACSeq1, fNameOut );
+    iaacoder1_toc = toc( iaacoder1_tic );
     
     %% Finished
-    toc
+    demoaac1_toc = toc( demoaac1_tic );
     
     % Write output file
     if ( nargout == 0 )
@@ -42,7 +46,20 @@ function SNR = demoAAC1( fNameIn, fNameOut, confset )
         
     end
 
-    % Print SNR
-    [ SNR, ~, ~ ] = L1_AACODER_snr( y, y_out );
+    % Compute SNR
+    [ SNR, SNR_L, SNR_R ] = L1_AACODER_snr( y, y_out );
+    
+    % Print results
+    fprintf([ ...
+        'Level 1\n', ...
+        '=======\n', ...
+        'Coding: time ellapsed is %0.5f seconds\n', ...
+        'Decoding: time ellapsed is %0.5f seconds\n', ...
+        '\t-> total time: %0.5f seconds\n', ...
+        'Channel 1 SNR: %0.4f dB\n', ...
+        'Channel 2 SNR: %0.4f dB\n', ...
+        '\t-> mean SNR: %0.4f seconds\n', ...
+        ], aacoder1_toc, iaacoder1_toc, demoaac1_toc, SNR_L, SNR_R, SNR ...
+    )
 
 end
