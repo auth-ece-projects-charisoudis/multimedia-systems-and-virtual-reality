@@ -1,4 +1,4 @@
-# Multimedia Systems
+# AAC Codec - Matlab
 
 Matlab Code for semester project in Multimedia Systems
 
